@@ -69,27 +69,31 @@ li:hover {
 }
 
 .projects {
+  
   color: red;
 }
 
 .contact {
+
   color: red;
 }
 
-@media screen and (min-width: 10px) {
-  aside {
-    display: flex;
-    justify-content: center;
-  }
-  aside ul {
-    display: flex;
-    gap: 0 3em;
-  }
-  aside ul li {
-    list-style-type: none;
-    color: var(--blue1);
-    position: relative;
-  }
+aside {
+  display: block;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+aside ul {
+  position: fixed;
+  display: block;
+}
+
+aside ul li {
+  list-style-type: none;
+  color: var(--blue1);
 }
 
 @media screen and (min-width: 600px) {
@@ -100,6 +104,10 @@ li:hover {
   .container-spaced img {
     width: 5em;
     height: 5em;
+  }
+  
+  aside {
+      left: 80%;
   }
 
   /* Font sizes for mobile need to be checked when website is done */
@@ -118,26 +126,18 @@ li:hover {
   p {
     font-size: 1em;
   }
+
   li {
     font-size: 1em;
   }
+
   h1 {
     font-size: 1.5em;
   }
-
   aside {
-    display: block;
-    position: absolute;
-    height: 100%;
-    left: 90%;
-    top: 0;
-    bottom: 0;
-    right: 0;
+      left: 85%;
   }
-  aside ul {
-    position: fixed;
-    display: block;
-  }
+  
 }
 
 @media screen and (min-width: 1400px) {
@@ -154,6 +154,9 @@ li:hover {
   }
   h1 {
     font-size: 2em;
+  }
+  aside {
+      left: 90%;
   }
 }
 

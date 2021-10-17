@@ -20,6 +20,11 @@ var ticking = false;
 var active = true;
 
 const elSmoothScroll = document.getElementById('smooth-scroll');
+const elHome = document.getElementById('home');
+const elAbout = document.getElementById('about');
+const elProjects = document.getElementById('projects');
+const elContact = document.getElementById('contact');
+
 console.log('page height ' + fullpageHeight);
 function ScrollToNextNode(timestamp) {
     if (start == undefined) {
@@ -43,13 +48,11 @@ function ScrollToNextNode(timestamp) {
 
             if (scrolledY > prevScrollY) {
                 index = 0;
-                //requestAnimationFrame(Scrolldown);
                 Scrolldown(timestamp);
             }
 
             else if (scrolledY < prevScrollY) {
                 index = node.length -1;
-                //requestAnimationFrame(Scrollup);
                 Scrollup(timestamp);
             }
 
@@ -61,6 +64,9 @@ function ScrollToNextNode(timestamp) {
 
 function Scrolldown(ftime) {
     console.log('ftime ' + ftime);
+    if (start == undefined) {
+        start = ftime;
+    }
     const elapsed = ftime - start;
     if (prevScrollY < (node[0].clientHeight * index)) {
         ticking = true;
@@ -89,8 +95,12 @@ function Scrolldown(ftime) {
     else {
         ticking = false;
     }
+    start = ftime;
 }
 function Scrollup(ftime) {
+    if (start == undefined) {
+        start = ftime;
+    }
     const elapsed = ftime - start;
 
     if (prevScrollY > (node[0].clientHeight * index)) {
@@ -118,6 +128,7 @@ function Scrollup(ftime) {
     else {
         ticking = false;
     }
+    start = ftime;
 }
 
 export function SmoothScroll() {
@@ -147,6 +158,47 @@ elSmoothScroll.addEventListener('click', function() {
         active = true;
     }
     console.log('scroll active: ' + active);
+});
+
+elHome.addEventListener('click', function() {
+    console.log('click');
+    index = 0;
+    if (prevScrollY < (node[0].clientHeight * index)) {
+        requestAnimationFrame(Scrolldown);
+    }
+    else {
+        requestAnimationFrame(Scrollup);
+    }
+});
+
+elAbout.addEventListener('click', function() {
+    index = 1;
+    if (prevScrollY < (node[0].clientHeight * index)) {
+        requestAnimationFrame(Scrolldown);
+    }
+    else {
+        requestAnimationFrame(Scrollup);
+    }
+});
+
+elProjects.addEventListener('click', function() {
+    index = 2;
+    if (prevScrollY < (node[0].clientHeight * index)) {
+        requestAnimationFrame(Scrolldown);
+    }
+    else {
+        requestAnimationFrame(Scrollup);
+    }
+});
+
+elContact.addEventListener('click', function() {
+    index = 3;
+    if (prevScrollY < (node[0].clientHeight * index)) {
+        requestAnimationFrame(Scrolldown);
+    }
+    else {
+        requestAnimationFrame(Scrollup);
+    }
 });
 
 document.querySelector('path').setAttribute('d', 
