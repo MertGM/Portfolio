@@ -3,6 +3,15 @@
 // if that happens, we set the location at the top of the page.
 var fullpageHeight = document.documentElement.scrollHeight
 
+//TODO: Clean up the functions so that it can be easily used as a library
+//
+//
+//TODO: Get all parent elements and divide it by the amount of parents.
+// Scroll untill the current height (n) is equal to the n+1 height.
+//
+//
+//TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
+
 window.addEventListener('load', function(e) {
     console.log('loaded');
 });
@@ -14,7 +23,13 @@ var scrollStart;
 var scrolledY;
 var prevScrollY = document.documentElement.scrollTop;
 console.log(prevScrollY);
-var node = document.querySelectorAll('.container100')
+//var node = document.querySelectorAll('.container100')
+//
+// Create a shallow copy of the body's HTMLCollection
+// The -1 removes the script element from the array
+var node = Array.from(document.body.children).slice(0, document.body.children.length -1)
+// The height of the top page, which is '0' in height 
+node.unshift({clientHeight: 0});
 var index = 0;
 var ticking = false;
 var active = true;
@@ -37,11 +52,13 @@ function ScrollToNextNode(timestamp) {
     console.log('TIMESTAMP' + timestamp);
     console.log('ELAPSED: ' + elapsed);
     if (elapsed > 100) { 
-        node = document.querySelectorAll('.container100');
         scrolledY = document.documentElement.scrollTop;
+        start = timestamp;
         console.log('start: ' + start);
 
-            console.log('node ' + (node[0].clientHeight * index));
+            console.log('node ' + (node[index].clientHeight * index));
+            console.log('node value' + node[3].clientHeight);
+            console.log('node obj %o', node);
             console.log('PREVSCROLLY ' + prevScrollY);
             console.log('SCROLLEDY ' + scrolledY);
             console.log('INDEX ' + index);
@@ -56,28 +73,23 @@ function ScrollToNextNode(timestamp) {
                 Scrollup(timestamp);
             }
 
-        console.log('PREVSCROLL Y ' + prevScrollY);
-        console.log('SCROLLED Y ' + scrolledY);
-        start = timestamp;
     }
 }
 
 function Scrolldown(ftime) {
-    console.log('ftime ' + ftime);
-    if (start == undefined) {
-        start = ftime;
-    }
     const elapsed = ftime - start;
-    if (prevScrollY < (node[0].clientHeight * index)) {
+    
+    const sum = Sum(node, index);
+    console.log('Sum %c%s  ', 'color: blue;', sum);
+    if (prevScrollY < (Sum(node, index))) {
+        start = ftime;
         ticking = true;
         console.log('elapsed ' + elapsed);
         console.log('ftime ' + ftime);
         console.log('start ' + start);
 
-        // The +10 is because in first couple exectutions of the function,
-        // prevScrollY receives a fraction and causes the scroll to glitch/hitch
         prevScrollY = Math.min((prevScrollY + 10 + (0.1 * elapsed /10)),
-        (node[0].clientHeight * index));
+        sum);
         console.log('prevScrollY ' + prevScrollY);
         console.log('scrolled down');
         //scrolledY = scrollbarY;
@@ -86,31 +98,32 @@ function Scrolldown(ftime) {
 
         requestAnimationFrame(Scrolldown);
     }
-    else if (!ticking && index < node.length) {
+    else if (!ticking && index < node.length -1) {
         console.log('TICKING DOWN');
         index++;
         console.log('index ' + index);
+
         requestAnimationFrame(Scrolldown);
     }
     else {
         ticking = false;
     }
-    start = ftime;
 }
 function Scrollup(ftime) {
-    if (start == undefined) {
-        start = ftime;
-    }
     const elapsed = ftime - start;
 
-    if (prevScrollY > (node[0].clientHeight * index)) {
+    const sum = Sum(node, index);
+    console.log('Sum %c%s  ', 'color: blue;', sum);
+
+    if (prevScrollY > sum) {
+        start = ftime;
         ticking = true;
         console.log('elapsed ' + elapsed);
 
         // The -10 is because in first couple exectutions of the function,
         // prevScrollY receives a fraction and causes the scroll to glitch/hitch
         prevScrollY = Math.max((prevScrollY - 10 - (0.1 * elapsed /10)),
-        (node[0].clientHeight * index));
+        sum);
         //scrolledY = scrollbarY;
         document.documentElement.scroll(0, prevScrollY);
         // scroll to next elemen
@@ -128,7 +141,14 @@ function Scrollup(ftime) {
     else {
         ticking = false;
     }
-    start = ftime;
+}
+
+function Sum(htmlCollection, stop) {
+    var x = 0;
+    for (var i = 0; i <= stop; i++) {
+        x += htmlCollection[i].clientHeight;
+    }
+    return x;
 }
 
 export function SmoothScroll() {
