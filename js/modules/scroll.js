@@ -1,11 +1,11 @@
 //
 //
-//TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
+// TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
-//
+// 
 
 
-// The scroll object is imported as a reference, thus able to change it's properties externally
+// Objects are passed by reference, thus the scroll object is able to change it's properties externally
 
 export var scroll = {
     start: 0,
@@ -19,7 +19,19 @@ export var scroll = {
     index: 0,
     ticking: false,
     active: false,
+
 };
+
+// Hash table to an id and index lookup of the 'navigation' elements.
+// These elements are found via the parent element provided by the user.
+// Elements must be identical to the structure and id name 
+// of the containers to be able to scroll to.
+
+// Might make individual object in this object for each element.
+// Since the syntax gets cumbersome
+
+var navNodes = {
+}
 
 
 // Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in height
@@ -44,8 +56,6 @@ function ScrollToNextNode(timestamp) {
         scroll.start = timestamp;
 
         console.log('scroll.start: ' + scroll.start);
-        console.log('scroll' + (scroll.node[scroll.index].clientHeight * scroll.index));
-        console.log('scrollvalue' + scroll.node[3].clientHeight);
         console.log('scroll obj %o', scroll);
         console.log('scroll.prevScrollY ' + scroll.prevScrollY);
         console.log('scrolledY ' + scroll.scrolledY);
@@ -69,7 +79,7 @@ function ScrollToNextNode(timestamp) {
     }
 }
 
-export function Scrolldown(ftime) {
+function Scrolldown(ftime) {
 
     // incase the function does not get called via the scroll event,
     // e.g: via a click event
@@ -104,7 +114,7 @@ export function Scrolldown(ftime) {
 }
 
 
-export function Scrollup(ftime) {
+function Scrollup(ftime) {
     const elapsed = ftime - scroll.start;
 
     // incase the function does not get called via the scroll event,
@@ -136,6 +146,7 @@ export function Scrollup(ftime) {
     }
 }
 
+
 function Sum(htmlCollection, stop) {
     var x = 0;
     for (var i = 0; i <= stop; i++) {
@@ -144,17 +155,82 @@ function Sum(htmlCollection, stop) {
     return x;
 }
 
-export function SmoothScroll() {
-    window.addEventListener('scroll', function(e) {
+
+function EventHandler(event) {
+    console.log('event %o', event);
+    console.log('event target %o', event.target);
+    console.log('event target id %s', event.target.id);
+    console.log('nav outside handler: %s', navNodes[(event.target.id + 'Id')]);
+
+    if (event.type == 'scroll' && event.target == document) {
 
         // Because of the scroll event firing rapidly due to events being asynchronous,
         // which results in the event being fired, even during a function call in the event,
         // we use ticking.
         // ticking means it's busy scrolling the page, 
-        // we only start executing the function if we stop scrolling.
+        // we only start executing the function if we currently aren't scrolling scrolling.
         
         if (!scroll.ticking) {
             requestAnimationFrame(ScrollToNextNode);
         }
-    });
+    }
+
+    else if (event.type == 'click' && navNodes[(event.target.id + 'Id')]) {
+        console.log('found a click event!');
+        
+        console.log('nav found in handler: %s', navNodes[(event.target.id + 'Id')]);
+
+        // Yeah... might want to make seperate objects to avoid this syntax, idk
+        
+        const displacement = ( (navNodes[(event.target.id + 'Index')]) - scroll.index);
+
+        scroll.index = navNodes[(event.target.id + 'Index')];
+        console.log('displacement %s', displacement);
+        console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
+        console.log('scroll index +1 %s', (scroll.index) +1);
+
+        if (displacement < 0) {
+            requestAnimationFrame(Scrollup);
+        }
+
+        else if (displacement > 0) {
+            requestAnimationFrame(Scrolldown);
+        }
+    }
+}
+
+
+export function SmoothScroll() {
+    // Might want to enable capturing phase in the future if we have scrollable elements.
+    
+    if (!scroll.ticking) {
+        window.addEventListener('scroll', EventHandler, false);
+    }
+}
+
+
+// Add an event listener to the given argument which triggers the EventHandler
+// Argument: must be a parent of child elements with the child's id corresponding to
+// the container classes of the document.
+
+// Id's and indecies get put in a hash table (object) for instant lookup.
+// A navigator is a parent element that has a bubbling phase ... 
+
+export function Listen(nav) {
+    //  we create a lookup table (hash table) aka object,
+    //  if we don't already have one.
+    //  This is so we have instant access to the index (page) of an element (container)
+    
+    if (Object.keys(navNodes).length == 0) {
+        for (var i = 0; i < nav.children.length; i++) {
+            navNodes[((nav.children[i].id) + 'Id')] = nav.children[i].id;
+            navNodes[((nav.children[i].id) + 'Index')] = i;
+        }
+    }
+
+    console.log('navNodes %o', navNodes);
+    console.log('home id %o', navNodes.homeId);
+    console.log('home index %o', navNodes.homeIndex);
+
+    nav.addEventListener('click', EventHandler, false);
 }

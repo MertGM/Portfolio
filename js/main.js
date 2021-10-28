@@ -1,71 +1,10 @@
-import {SmoothScroll, scroll} from './modules/scroll.js';
-import {Scrollup, Scrolldown} from './modules/scroll.js';
+import {SmoothScroll, scroll, Listen} from './modules/scroll.js';
 
 SmoothScroll();
 
-
-// All the events handler for the web page
-
-const elSmoothScroll = document.getElementById('smooth-scroll');
-const elHome = document.getElementById('home');
-const elAbout = document.getElementById('about');
-const elProjects = document.getElementById('projects');
-const elContact = document.getElementById('contact');
-
-const pages = document.querySelectorAll('.container100');
-//console.log('pages: %o', pages[0].className);
-//console.log('pages: %o', pages[1].className);
-//console.log('pages: %o', pages[2].className);
-//console.log('pages: %o', pages[3].className);
-
-// Scroll to events currently not functioning correctly
-
-console.log('node: %o', scroll.node);
-console.log('node: %s', elHome.id);
-
-// Not working atm
-elHome.addEventListener('click', function() {
-    const index = scroll.index;
-    console.log('index: %s', index);
-        if (scroll.prevScrollY < scroll.node[index+1].clientHeight) {
-            requestAnimationFrame(Scrolldown);
-            }
-        else if (( ( (index != 0) && scroll.prevScrollY > scroll.node[index-1].clientHeight) )) {
-            requestAnimationFrame(Scrollup);
-                }
-});
-
-elAbout.addEventListener('click', function() {
-    const index = scroll.index;
-console.log('index: %s', index);
-        if (scroll.prevScrollY < scroll.node[index+1].clientHeight) {
-            requestAnimationFrame(Scrolldown);
-            }
-        else if (( ( (index != 0) && scroll.prevScrollY > scroll.node[index-1].clientHeight) )) {
-            requestAnimationFrame(Scrollup);
-                }
-});
-
-elProjects.addEventListener('click', function() {
-    const index = scroll.index;
-console.log('node: %s', index);
-        if (prevScrollY < scroll.node[index+1].clientHeight) {
-            requestAnimationFrame(Scrolldown);
-            }
-        else if (( ( (index != 0) && prevScrollY > scroll.node[index-1].clientHeight) )) {
-            requestAnimationFrame(Scrollup);
-                }
-});
-
-elContact.addEventListener('click', function() {
-        index = 3;
-        if (prevScrollY < (node[0].clientHeight * index)) {
-                    requestAnimationFrame(Scrolldown);
-                }
-        else {
-                    requestAnimationFrame(Scrollup);
-                }
-});
+// TODO: Might want to save the id names or class names instead of the element itself
+const nav = document.querySelector('ul');
+Listen(nav);
 
 
 // Code for the svg properties are valued here due to it's code cluttering
