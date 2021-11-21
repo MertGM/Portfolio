@@ -5,14 +5,14 @@
 // 
 
 
-// Objects are passed by reference, thus the scroll object is able to change it's properties externally
+// Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
 export var scroll = {
     start: 0,
     scrolledY: 0,
     prevScrollY: document.documentElement.scrollTop,
 
-    // This is a reference (shallow copy) of the body's HTMLCollection
+    // This is a "reference" (shallow copy) of the body's HTMLCollection
     // The -1 removes the script element from the array
     
     node: Array.from(document.body.children).slice(0, document.body.children.length -1),
@@ -91,19 +91,21 @@ function Scrolldown(ftime) {
     
     const sum = Sum(scroll.node, scroll.index);
     console.log('Sum %c%s  ', 'color: blue;', sum);
-    if (scroll.prevScrollY < (Sum(scroll.node, scroll.index))) {
+    if (scroll.prevScrollY < sum) {
         scroll.start = ftime;
         scroll.ticking = true;
 
         scroll.prevScrollY = Math.min((scroll.prevScrollY + 10 + (0.1 * elapsed /10)),
         sum);
+        /*scroll.prevScrollY = Math.min(((scroll.prevScrollY+1 * elapsed/60)*2),
+        sum);*/
         document.documentElement.scroll(0, scroll.prevScrollY);
 
         console.log('scroll.prevScrollY ' + scroll.prevScrollY);
         console.log('scrolled down');
-        /*console.log('elapsed ' + elapsed);
+        console.log('elapsed ' + elapsed);
         console.log('ftime ' + ftime);
-        console.log('scroll.start ' + scroll.start);*/
+        console.log('scroll.start ' + scroll.start);
 
         requestAnimationFrame(Scrolldown);
     }
@@ -156,7 +158,12 @@ function Sum(htmlCollection, stop) {
 }
 
 
-function EventHandler(event) {
+// Might make the EventHanlder reside in a different script file,
+// since it handles different events besides scroll
+
+export function EventHandler(event) {
+    // event.target gets the previous fired event
+    // This is handy when Event listener has a bubbling phase
     console.log('event %o', event);
     console.log('event target %o', event.target);
     console.log('event target id %s', event.target.id);
@@ -175,26 +182,71 @@ function EventHandler(event) {
         }
     }
 
-    else if (event.type == 'click' && navNodes[(event.target.id + 'Id')]) {
+    else if (event.type == 'click') {
         console.log('found a click event!');
+        if (event.target.id == navNodes[(event.target.id + 'Id')]) {
+            // Yeah... might want to make seperate objects to avoid this syntax, idk
+            
+            console.log('nav found in handler: %s', navNodes[(event.target.id + 'Id')]);
+
+            const displacement = ((navNodes[(event.target.id + 'Index')]) - scroll.index);
+            scroll.index = navNodes[(event.target.id + 'Index')];
+
+            console.log('displacement %s', displacement);
+            console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
+            console.log('scroll index +1 %s', (scroll.index) +1);
+
+            if (displacement < 0) {
+                requestAnimationFrame(Scrollup);
+            }
+
+            else if (displacement > 0) {
+                requestAnimationFrame(Scrolldown);
+            }
+        }
         
-        console.log('nav found in handler: %s', navNodes[(event.target.id + 'Id')]);
+        // TODO: Might want to set a bitfield with flags to avoid nested if statements
 
-        // Yeah... might want to make seperate objects to avoid this syntax, idk
+        // Checking for className doesn't work on svg elements,
+        // because it gives us a SVGAnimatedString instead unlike a normal html element
         
-        const displacement = ( (navNodes[(event.target.id + 'Index')]) - scroll.index);
+        
+        else if (event.target.className == 'smooth-scroll') {
+            console.log('Event target %o', event.target);
+            const el = document.querySelector('.smooth-scroll');
+            const elbody = document.querySelector('body');
+            console.log('element %o', el);
+            console.log('element %o', elbody);
 
-        scroll.index = navNodes[(event.target.id + 'Index')];
-        console.log('displacement %s', displacement);
-        console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
-        console.log('scroll index +1 %s', (scroll.index) +1);
+            if (el.id == 'on') {
+                el.id = 'off';
 
-        if (displacement < 0) {
-            requestAnimationFrame(Scrollup);
+                // Ticking true does not mean it's scrolling in this context;
+                // we set it to true to not listen in the SmoothScroll function
+                
+                scroll.ticking = true;
+            }
+
+            else if (el.id == 'off') {
+                el.id = 'on';
+                scroll.ticking = false;
+            }
         }
 
-        else if (displacement > 0) {
-            requestAnimationFrame(Scrolldown);
+        
+        else if (event.target.className == 'theme') {
+            console.log('Event target %o', event.target);
+            const el = document.querySelector('.theme');
+            console.log('element %s', el);
+            if (el.id == 'dark') {
+                el.id = 'light';
+                console.log('switched to light theme', el.id)
+            }
+
+            else if (el.id == 'light') {
+                el.id = 'dark';
+                console.log('switched to dark theme %s', el.id)
+            }
         }
     }
 }

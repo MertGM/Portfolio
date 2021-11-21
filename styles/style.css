@@ -5,6 +5,7 @@
   --blue3: #2f3aed;
   --green0: #2fedd7;
 }
+
 html,
 body {
   width: 100%;
@@ -14,13 +15,99 @@ body {
   margin: 0;
 }
 
+.spinner#visible {
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+    z-index: 2;
+}
+
+.spinner#hidden {
+    display: none;
+}
+
 p {
   font-size: 1rem;
 }
 
+.options-menu {
+    display: block;
+    position: fixed;
+    width: 25%;
+    height: 30%;
+    left: 0;
+    top: 0;
+    opacity: 1;
+    border-radius: 3em;
+    background-color: rgba(85,180, 255, 0.3);
+}
+
+#close-button-wrapper {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 150px;
+    width: 150px;
+    z-index: 1;
+    pointer-events: none;
+    margin-top: 1em;
+}
+
+#inner-circle {
+    pointer-events: fill;
+    cursor: pointer;
+}
+
+.options {
+    flex-flow: row wrap;
+    flex-grow: 0;
+    flex-shrink: 0;
+    justify-content: space-between;
+    box-sizing: border-box;
+    opacity: 1;
+}
+
+.options li {
+  list-style-type: none;
+}
+
+/* name of the settings being a nested flexbox, to make 1 row of columns */
+
+.options-menu-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    margin-top: 20%;
+}
+
+.options-menu-wrapper svg {
+    width: 52%;
+    height: 100%;
+}
+
+.options-menu-wrapper .theme-dark {
+    color: var(--blue0);
+}
+
+.options #light {
+    color: yellow;
+}
+
+.options #on {
+    color: yellow;
+}
+
+.smooth-scroll #off {
+    color: var(--blue0);
+}
+
 #smooth-scroll {
     color: var(--blue0);
-
 }
 
 li:hover {
@@ -173,10 +260,4 @@ aside ul li {
   h1 {
     font-size: 3em;
   }
-}
-
-#img1 {
-  /* TEMP FIX: img does not fit on svg block; absolute monkey patches it */
-  position: absolute;
-  left: 45%;
 }

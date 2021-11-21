@@ -5,17 +5,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio</title>
+    <script type="module" src="js/main.js"></script>
     <link rel="stylesheet" href="styles/style.css" />
   </head>
   <body>
+    <div class="spinner" id="visible">
+    </div>
     <div class="container100 home">
-        <div class="text-left">
-            <div id="smooth-scroll">
-                <p>Smooth scroll</p>
-            </div>
-        </div>
+      <svg id="close-button-wrapper" viewbox="0 0 50 80">
+          <circle id="inner-circle" cy="23%" cx="20%" r="14" stroke="#5145ff" stroke-width="5px" fill="none" />
+          <circle id="outer-circle" cy="23%" cx="20%" r="7" fill="#00a0ff" />
+      </svg>
+    <options-menu class="options-menu">
+      <div class="options-menu-wrapper" id="hidden">
+          <div class="options">
+              <ul>
+                <li class="smooth-scroll" id="on">Smooth Scroll</li>
+                <li class="theme-dark">Theme</li>
+                <li class="theme-dark">Theme</li>
+                <li class="theme-dark">Theme</li>
+                <li class="theme-dark">Theme</li>
+              </ul>
+          </div>
+          <svg viewbox="0 0 50 80">
+              <path id="animation" stroke="green" stroke-width="5" d="m 10,10 h 10" />
+          </svg>
+      </div>
+    </options-menu>
     <aside>
-      <ul>
+      <ul class="nav">
         <li id="home">Home</li>
         <li id="about">about</li>
         <li id="projects">projects</li>
@@ -26,11 +44,9 @@
           <h1><!--Mert Dalkiran--></h1>
       </div>
       <div class="container-spaced">
-        <!-- Gonna make the icons much smaller, it's not priority-->
         <svg viewBox="0 0 800 600">
           <path fill-rule="evenodd" id="github-svg" style="fill: #31d9f7" />
         </svg>
-        <img id="img1" src="./images/dice_1.jpg" alt="temp1" />
       </div>
     </div>
     <div class="container100 about">
@@ -49,6 +65,5 @@
     <div class="container100 contact">
       <h1>Contact</h1>
     </div>
-    <script type="module" src="js/main.js"></script>
   </body>
 </html>
