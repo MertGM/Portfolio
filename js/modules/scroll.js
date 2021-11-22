@@ -11,16 +11,19 @@ export var scroll = {
     start: 0,
     scrolledY: 0,
     prevScrollY: document.documentElement.scrollTop,
+    currentScrollY: document.documentElement.scrollTop,
 
     // This is a "reference" (shallow copy) of the body's HTMLCollection
     // The -1 removes the script element from the array
     
-    node: Array.from(document.body.children).slice(0, document.body.children.length -1),
+    node: Array.from(document.body.children),
     index: 0,
     ticking: false,
     active: false,
 
 };
+
+var t = 0;
 
 // Hash table to an id and index lookup of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
@@ -37,6 +40,7 @@ var navNodes = {
 // Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in height
 
 scroll.node.unshift({clientHeight: 0});
+console.log(scroll.node);
 
 
 function ScrollToNextNode(timestamp) {
@@ -79,70 +83,65 @@ function ScrollToNextNode(timestamp) {
     }
 }
 
-function Scrolldown(ftime) {
+// Quadratic bezier curve
+function Easein(p0,p1,p2) {
+    var p = (((1-t)**2 * p0) + (2*(1-t)*t*p1) + (t**2*p2))
+    document.documentElement.scroll(0, p);
+    return p;
+}
 
-    // incase the function does not get called via the scroll event,
-    // e.g: via a click event
-    if (scroll.start == undefined) {
-        scroll.start = ftime;
-    }
+function Scrolldown() {
 
-    const elapsed = ftime - scroll.start;
-    
     const sum = Sum(scroll.node, scroll.index);
     console.log('Sum %c%s  ', 'color: blue;', sum);
-    if (scroll.prevScrollY < sum) {
-        scroll.start = ftime;
+    if (scroll.currentScrollY < sum) {
         scroll.ticking = true;
 
-        scroll.prevScrollY = Math.min((scroll.prevScrollY + 10 + (0.1 * elapsed /10)),
-        sum);
+        //scroll.prevScrollY = Math.min((scroll.prevScrollY + 10 + (0.1 * elapsed /10)),
+        //sum);
         /*scroll.prevScrollY = Math.min(((scroll.prevScrollY+1 * elapsed/60)*2),
         sum);*/
-        document.documentElement.scroll(0, scroll.prevScrollY);
+        //document.documentElement.scroll(0, scroll.prevScrollY);
+
+        // Placeholder values, easing can be smoother than it is.
+        
+        scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY +600, sum);
+        t+= 0.02;
+
 
         console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+        console.log('scroll.currentScrollY ' + scroll.currentScrollY);
         console.log('scrolled down');
-        console.log('elapsed ' + elapsed);
-        console.log('ftime ' + ftime);
-        console.log('scroll.start ' + scroll.start);
 
         requestAnimationFrame(Scrolldown);
     }
     else {
+        scroll.prevScrollY = scroll.currentScrollY;
+        t = 0;
         // End of scrolling
         scroll.ticking = false;
     }
 }
 
 
-function Scrollup(ftime) {
-    const elapsed = ftime - scroll.start;
-
-    // incase the function does not get called via the scroll event,
-    // e.g: via a click event
-    if (scroll.start == undefined) {
-        scroll.start = ftime;
-    }
+function Scrollup() {
 
     const sum = Sum(scroll.node, scroll.index);
     console.log('Sum %c%s  ', 'color: blue;', sum);
 
-    if (scroll.prevScrollY > sum) {
-        scroll.start = ftime;
+    if (scroll.currentScrollY > sum) {
         scroll.ticking = true;
 
-        // The -10 is because in first couple exectutions of the function,
-        // scroll.prevScrollY receives a fraction and causes the scroll to glitch/hitch
-        scroll.prevScrollY = Math.max((scroll.prevScrollY - 10 - (0.1 * elapsed /10)),
-        sum);
-        document.documentElement.scroll(0, scroll.prevScrollY);
+        scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY -600, sum);
+        t+= 0.02;
 
-        console.log('elapsed ' + elapsed);
+
         console.log('scrolled up ' + scroll.prevScrollY);
         requestAnimationFrame(Scrollup);
     }
     else {
+        scroll.prevScrollY = scroll.currentScrollY;
+        t = 0;
         // End of scrolling
         scroll.ticking = false;
     }
@@ -151,7 +150,7 @@ function Scrollup(ftime) {
 
 function Sum(htmlCollection, stop) {
     var x = 0;
-    for (var i = 0; i <= stop; i++) {
+    for (var i = 0; i < stop; i++) {
         x += htmlCollection[i].clientHeight;
     }
     return x;
@@ -188,13 +187,31 @@ export function EventHandler(event) {
             // Yeah... might want to make seperate objects to avoid this syntax, idk
             
             console.log('nav found in handler: %s', navNodes[(event.target.id + 'Id')]);
+            var displacement = 0;
 
-            const displacement = ((navNodes[(event.target.id + 'Index')]) - scroll.index);
-            scroll.index = navNodes[(event.target.id + 'Index')];
+            for (var i = 0; i < scroll.node.length; i++) {
+                var classes = scroll.node[i].classList;
 
-            console.log('displacement %s', displacement);
-            console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
-            console.log('scroll index +1 %s', (scroll.index) +1);
+                // element with no class name
+                if (classes == undefined) {
+                    continue;
+                }
+                console.log('class list %o', classes);
+                for (var j = 0; j < classes.length; j++) {
+                    if (classes[j] == navNodes[(event.target.id + 'Id')]) {
+                        displacement = i - scroll.index;
+                        scroll.index = i;
+                        console.log('class index %s', i);
+                        console.log('element %o', classes[j]);
+                    }
+                }
+            }
+            //const displacement = ((navNodes[(event.target.id + 'Index')]) - scroll.index);
+            //scroll.index = navNodes[(event.target.id + 'Index')];
+
+            //console.log('displacement %s', displacement);
+            //console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
+            //console.log('scroll index +1 %s', (scroll.index) +1);
 
             if (displacement < 0) {
                 requestAnimationFrame(Scrollup);
@@ -254,6 +271,8 @@ export function EventHandler(event) {
 
 export function SmoothScroll() {
     // Might want to enable capturing phase in the future if we have scrollable elements.
+    
+    // Could use a promise instead of a ticking boolean
     
     if (!scroll.ticking) {
         window.addEventListener('scroll', EventHandler, false);
