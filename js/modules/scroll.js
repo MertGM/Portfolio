@@ -8,13 +8,12 @@
 // Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
 export var scroll = {
-    start: 0,
     scrolledY: 0,
     prevScrollY: document.documentElement.scrollTop,
-    currentScrollY: document.documentElement.scrollTop,
+    currentScrollY: 0,
 
-    // This is a "reference" (shallow copy) of the body's HTMLCollection
-    // The -1 removes the script element from the array
+    // This is a "reference" (shallow copy) of the body's HTMLCollection.
+    // The -1 removes the script element from the array.
     
     node: Array.from(document.body.children),
     index: 0,
@@ -23,64 +22,51 @@ export var scroll = {
 
 };
 
+// RequestAnimationFrame doesn't accept arguments, so for now
+// these variables are global.
+
 var t = 0;
+var sum = 0;
 
 // Hash table to an id and index lookup of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
-// Elements must be identical to the structure and id name 
+// Elements must be identical to the structure, and id name 
 // of the containers to be able to scroll to.
 
 // Might make individual object in this object for each element.
-// Since the syntax gets cumbersome
+// Since the syntax gets cumbersome.
 
 var navNodes = {
 }
 
 
-// Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in height
+// Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in 'height'
 
 scroll.node.unshift({clientHeight: 0});
 console.log(scroll.node);
 
 
-function ScrollToNextNode(timestamp) {
-    if (scroll.start == undefined) {
-        scroll.start = timestamp;
-    }
+function ScrollToNextNode() {
+    scroll.scrolledY = document.documentElement.scrollTop;
 
-    const elapsed = timestamp - scroll.start;
+    console.log('scroll obj %o', scroll);
+    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+    console.log('scrolledY ' + scroll.scrolledY);
+    console.log('scroll' + scroll.index);
+    console.log('node obj %o', scroll.node);
 
-    /*console.log('ENTERED FUNCTION');
-    console.log('scroll.start' + scroll.start);
-    console.log('TIMESTAMP' + timestamp);
-    console.log('ELAPSED: ' + scroll.elapsed);*/
+        if (scroll.scrolledY > scroll.prevScrollY) {
+            // Include the index of the page below (relative to the current page) beforehand,
+            // to calculate the sum in the scrolldown function
+            scroll.index += 1;
+            Scrolldown();
+        }
 
-    if (elapsed > 100) { 
-        scroll.scrolledY = document.documentElement.scrollTop;
-        scroll.start = timestamp;
-
-        console.log('scroll.start: ' + scroll.start);
-        console.log('scroll obj %o', scroll);
-        console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-        console.log('scrolledY ' + scroll.scrolledY);
-        console.log('scroll' + scroll.index);
-        console.log('node obj %o', scroll.node);
-
-            if (scroll.scrolledY > scroll.prevScrollY) {
-                // Include the index of the page below (relative to the current page) beforehand,
-                // to calculate the sum in the scrolldown function
-                scroll.index += 1;
-                Scrolldown(timestamp);
-            }
-
-            else if (scroll.scrolledY < scroll.prevScrollY) {
-                // Include the index of the page above (relative to the current page) beforehand,
-                // to calculate the sum in the scrolldown function
-                scroll.index -= 1;
-                Scrollup(timestamp);
-            }
-
-    }
+        else if (scroll.scrolledY < scroll.prevScrollY) {
+            // Same reason as above
+            scroll.index -= 1;
+            Scrollup();
+        }
 }
 
 // Quadratic bezier curve
@@ -91,62 +77,76 @@ function Easein(p0,p1,p2) {
 }
 
 function Scrolldown() {
-
-    const sum = Sum(scroll.node, scroll.index);
-    console.log('Sum %c%s  ', 'color: blue;', sum);
-    if (scroll.currentScrollY < sum) {
+    // Todo: Scroll function doesn't acknowledge the page starting somewhere but the first container;
+    // e.g: on reloading the page at a specific location, the page will stay on the previous location.
+    // Our algorithm thinks it will always start at the top of the page (the first container).
+    
+    // Only calculate the sum on the first call of this function
+    if (!scroll.ticking) {
+        sum = Sum(scroll.node, scroll.index);
         scroll.ticking = true;
-
-        //scroll.prevScrollY = Math.min((scroll.prevScrollY + 10 + (0.1 * elapsed /10)),
-        //sum);
-        /*scroll.prevScrollY = Math.min(((scroll.prevScrollY+1 * elapsed/60)*2),
-        sum);*/
-        //document.documentElement.scroll(0, scroll.prevScrollY);
-
-        // Placeholder values, easing can be smoother than it is.
-        
-        scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY +600, sum);
-        t+= 0.02;
-
-
-        console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-        console.log('scroll.currentScrollY ' + scroll.currentScrollY);
-        console.log('scrolled down');
-
-        requestAnimationFrame(Scrolldown);
     }
-    else {
+
+    if (scroll.currentScrollY >= sum) {
+         
         scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
         scroll.ticking = false;
+        return;
+
     }
+
+    console.log('Sum %c%s  ', 'color: blue;', sum);
+
+
+    // Placeholder values, easing can be smoother than it is.
+    
+    scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY +600, sum);
+    t+= 0.02;
+
+
+    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+    console.log('scroll.currentScrollY ' + scroll.currentScrollY);
+    console.log('scrolled down');
+
+    requestAnimationFrame(Scrolldown);
 }
 
 
 function Scrollup() {
 
-    const sum = Sum(scroll.node, scroll.index);
-    console.log('Sum %c%s  ', 'color: blue;', sum);
-
-    if (scroll.currentScrollY > sum) {
+    if (!scroll.ticking) {
+        sum = Sum(scroll.node, scroll.index);
         scroll.ticking = true;
-
-        scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY -600, sum);
-        t+= 0.02;
-
-
-        console.log('scrolled up ' + scroll.prevScrollY);
-        requestAnimationFrame(Scrollup);
     }
-    else {
+
+
+    if (scroll.currentScrollY <= sum) {
+         
         scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
         scroll.ticking = false;
-    }
-}
+        return;
 
+    }
+
+    console.log('Sum %c%s  ', 'color: blue;', sum);
+
+
+    // Placeholder values, easing can be smoother than it is.
+    
+    scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY -600, sum);
+    t+= 0.02;
+
+
+    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+    console.log('scroll.currentScrollY ' + scroll.currentScrollY);
+    console.log('scrolled up');
+
+    requestAnimationFrame(Scrollup);
+}
 
 function Sum(htmlCollection, stop) {
     var x = 0;
@@ -155,7 +155,6 @@ function Sum(htmlCollection, stop) {
     }
     return x;
 }
-
 
 // Might make the EventHanlder reside in a different script file,
 // since it handles different events besides scroll
@@ -239,7 +238,7 @@ export function EventHandler(event) {
                 el.id = 'off';
 
                 // Ticking true does not mean it's scrolling in this context;
-                // we set it to true to not listen in the SmoothScroll function
+                // we set it to true to not listen in the AutoScroll function
                 
                 scroll.ticking = true;
             }
@@ -268,15 +267,9 @@ export function EventHandler(event) {
     }
 }
 
-
-export function SmoothScroll() {
-    // Might want to enable capturing phase in the future if we have scrollable elements.
-    
-    // Could use a promise instead of a ticking boolean
-    
-    if (!scroll.ticking) {
-        window.addEventListener('scroll', EventHandler, false);
-    }
+// This function will enable auto scrolling for the given page.
+export function AutoScroll() {
+    window.addEventListener('scroll', EventHandler, false);
 }
 
 

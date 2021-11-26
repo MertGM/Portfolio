@@ -3,10 +3,10 @@ import {Animate, PreloadAnimations} from './modules/animate.js';
 PreloadAnimations();
 Animate();
 
-import {SmoothScroll, scroll, Listen} from './modules/scroll.js';
+import {AutoScroll, scroll, Listen} from './modules/scroll.js';
 
 
-SmoothScroll();
+AutoScroll();
 
 const nav = document.querySelector('.nav');
 const options = document.querySelector('.options');

@@ -1,9 +1,28 @@
 :root {
-  --blue0: #31d9f7;
-  --blue1: #389ae0;
-  --blue2: #3171f7;
-  --blue3: #2f3aed;
+  --bg-primary: #003;
+  --bg-modal-primary: rgba(85,180, 255, 0.3); 
+  --font-primary: #31d9f7;
+  --font-secondary: #389ae0;
+  --font-secondary: #3171f7;
+  --border-primary: #2f3aed;
+  --btn-primary: #5145ff;
+  --btn-secondary: #00a0ff;
   --green0: #2fedd7;
+}
+
+body.light {
+  --bg-primary: #fff;
+  --bg-modal-primary: rgba(249,248, 113, 0.3); 
+  --font-primary: #31d9f7;
+  --font-secondary: #389ae0;
+  --font-secondary: #3171f7;
+  --border-primary: #2f3aed;
+  --btn-primary: #EFBF1F;
+  --btn-secondary: #E2641B;
+}
+
+label {
+    color: green;
 }
 
 html,
@@ -11,8 +30,16 @@ body {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  background-color: #003;
+  background-color: var(--bg-primary);
   margin: 0;
+}
+
+#hidden {
+    display: none;
+}
+
+#visible {
+    display:block;
 }
 
 .spinner#visible {
@@ -24,9 +51,7 @@ body {
     z-index: 2;
 }
 
-.spinner#hidden {
-    display: none;
-}
+
 
 p {
   font-size: 1rem;
@@ -36,12 +61,11 @@ p {
     display: block;
     position: fixed;
     width: 25%;
-    height: 30%;
+    height: 50%;
     left: 0;
     top: 0;
-    opacity: 1;
     border-radius: 3em;
-    background-color: rgba(85,180, 255, 0.3);
+    background-color: var(--bg-modal-primary);
 }
 
 #close-button-wrapper {
@@ -56,8 +80,15 @@ p {
     margin-top: 1em;
 }
 
+#outer-circle {
+    pointer-events: stroke;
+    stroke: var(--btn-primary);
+    cursor: pointer;
+}
+
 #inner-circle {
     pointer-events: fill;
+    fill: var(--btn-secondary);
     cursor: pointer;
 }
 
@@ -72,6 +103,7 @@ p {
 
 .options li {
   list-style-type: none;
+  margin-bottom: 2em;
 }
 
 /* name of the settings being a nested flexbox, to make 1 row of columns */
@@ -79,43 +111,37 @@ p {
 .options-menu-wrapper {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-between;
     width: 100%;
     height: 100%;
-    margin-top: 20%;
+    margin-top: 5em;
 }
 
 .options-menu-wrapper svg {
     width: 52%;
-    height: 100%;
+    height: 65%;
 }
 
-.options-menu-wrapper .theme-dark {
-    color: var(--blue0);
+.theme {
+    color: var(--font-primary);
 }
 
-.options #light {
-    color: yellow;
+.auto-scroll-text {
+    color: var(--font-primary);
 }
 
-.options #on {
-    color: yellow;
+.moon {
+    pointer-events: fill;
+    cursor: pointer;
 }
 
-.smooth-scroll #off {
-    color: var(--blue0);
+.sun {
+    pointer-events: fill;
+    cursor: pointer;
 }
 
-#smooth-scroll {
-    color: var(--blue0);
-}
-
-li:hover {
-  cursor: pointer;
-}
-
-#smooth-scroll:hover {
-  cursor: pointer;
+.auto-scroll {
+    pointer-events: stroke;
+    cursor: pointer;
 }
 
 .text-left {
@@ -128,7 +154,7 @@ li:hover {
   width: 50%;
   display: flex;
   justify-content: center;
-  color: var(--blue2);
+  color: var(--font-secondary);
 }
 .container100 {
   display: flex;
@@ -143,9 +169,9 @@ li:hover {
   display: flex;
   flex-wrap: wrap;
   width: 60%;
-  height: 60%;
+  height: auto;
   justify-content: space-between;
-  border-color: var(--blue3);
+  border-color: var(--border-primary);
   border-width: 1rem;
   border-radius: 5rem;
   border-style: solid;
@@ -168,47 +194,64 @@ li:hover {
 aside {
   display: block;
   position: absolute;
-  height: 100%;
-  top: 0;
+  height: auto;
+  top: 40%;
   bottom: 0;
   right: 0;
 }
 aside ul {
   position: fixed;
   display: block;
+  padding-bottom: 1em;
 }
 
 aside ul li {
   list-style-type: none;
-  color: var(--blue1);
+  color: var(--font-primary);
+  cursor: pointer;
   margin-bottom: 0.5em;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (max-width: 600px) {
+
+  .options-menu {
+      width: 100%;
+  }
   .container-spaced {
     border-width: 0.5em;
     border-radius: 3em;
-  }
-  .container-spaced img {
-    width: 5em;
-    height: 5em;
   }
   
   aside {
       left: 80%;
   }
 
+  #links {
+  }
+
   /* Font sizes for mobile need to be checked when website is done */
 }
 
+@media screen and (min-width: 600px) {
+  .options-menu {
+      width: 50%;
+  }
+  aside {
+      left: 80%;
+  }
+  #links {
+      width: 100%;
+  }
+}
+
 @media screen and (min-width: 900px) {
+  .options-menu {
+      width: 40%;
+  }
   .container-spaced {
     border-width: 1em;
     border-radius: 5em;
-  }
-  .container-spaced img {
-    width: 10em;
-    height: 10em;
+    height: auto;
   }
 
   p {
@@ -225,15 +268,16 @@ aside ul li {
   aside {
       left: 85%;
   }
-  
 }
 
 @media screen and (min-width: 1400px) {
-  .container-spaced img {
-    width: 12em;
-    height: 12em;
+  .options-menu {
+      width: 30%;
   }
 
+  .container-spaced {
+      height: 60%;
+  }
   p {
     font-size: 1em;
   }
@@ -246,13 +290,12 @@ aside ul li {
   aside {
       left: 90%;
   }
+  #links {
+      width: 70%;
+  }
 }
 
 @media screen and (min-width: 1900px) {
-  .container-spaced img {
-    width: 14em;
-    height: 14em;
-  }
   p,
   li {
     font-size: 2em;

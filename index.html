@@ -13,22 +13,25 @@
     </div>
     <div class="container100 home">
       <svg id="close-button-wrapper" viewbox="0 0 50 80">
-          <circle id="inner-circle" cy="23%" cx="20%" r="14" stroke="#5145ff" stroke-width="5px" fill="none" />
-          <circle id="outer-circle" cy="23%" cx="20%" r="7" fill="#00a0ff" />
+          <circle id="outer-circle" cy="23%" cx="20%" r="14" stroke-width="5px" fill="none" />
+          <circle id="inner-circle" cy="23%" cx="20%" r="7" stroke-width="0px" />
       </svg>
     <options-menu class="options-menu">
-      <div class="options-menu-wrapper" id="hidden">
+      <div class="options-menu-wrapper">
           <div class="options">
               <ul>
-                <li class="smooth-scroll" id="on">Smooth Scroll</li>
-                <li class="theme-dark">Theme</li>
-                <li class="theme-dark">Theme</li>
-                <li class="theme-dark">Theme</li>
-                <li class="theme-dark">Theme</li>
+                <li class="auto-scroll-text" id="off">Smooth Scroll</li>
+                <li class="theme">Dark mode</li>
+
+                <li class="theme">Theme</li>
+                <li class="theme">Theme</li>
+                <li class="theme">Theme</li>
               </ul>
           </div>
-          <svg viewbox="0 0 50 80">
-              <path id="animation" stroke="green" stroke-width="5" d="m 10,10 h 10" />
+          <svg id="options-icons" viewbox="0 0 50 80">
+              <path class="auto-scroll" id="on" stroke="green" stroke-width="5" d="m 10,10 h 10" />
+              <path class="moon" id="visible" fill="grey" d="m 5,30 a 9,9 21.66 0 0 1.61,0.47 9.302,10.75 21.66 0 0 11.72,-8.57 9.302,10.75 21.66 0 0 0,-5.52 9.218,9.726 73.81 0 1 1.98,7.96 9.218,9.726 73.81 0 1 -11.66,7.16 9.218,9.726 73.81 0 1 -3.65,-1.5 z"/>
+              <circle class="sun" id="hidden" fill="yellow" r="7" cy="23" cx="13"/>
           </svg>
       </div>
     </options-menu>
@@ -44,7 +47,7 @@
           <h1><!--Mert Dalkiran--></h1>
       </div>
       <div class="container-spaced">
-        <svg viewBox="0 0 800 600">
+        <svg id="links" viewBox="0 0 800 600">
           <path fill-rule="evenodd" id="github-svg" style="fill: #31d9f7" />
         </svg>
       </div>

@@ -6,25 +6,37 @@
 var optionsMenu = document.querySelector('.options-menu');
 var optionsMenuWrapper = document.querySelector('.options-menu-wrapper');
 var options = document.querySelector('.options');
+var optionIcons = document.getElementById('options-icons');
 
 var optionsMenuAnimation = optionsMenu.animate([
     { transform: 'scale(0, 0)'},
     ], {
         fill: 'forwards',
         easing: 'ease-in-out',
-        duration: 2000
+        duration: 1500
     });
 optionsMenuAnimation.pause();
 
 
 var optionsAnimation = options.animate([
-    {opacity: 0}
+    {opacity: 0},
     ], {
         fill: 'forwards',
         easing: 'ease-in-out',
-        duration: 3000
+        duration: 1000
     });
 optionsAnimation.pause();
+
+
+var optionIconsAnimation = optionIcons.animate([
+    {opacity: 0},
+    ], {
+        fill: 'forwards',
+        easing: 'ease-in-out',
+        duration: 1000
+    });
+optionIconsAnimation.pause();
+
 
 
 var spinnerBackground = document.querySelector('.spinner');
@@ -47,7 +59,7 @@ if (optionsCollapsed == null) {
 
 
 
-var buttonScroll = document.getElementById('animation');
+var buttonScroll = document.querySelector('.auto-scroll');
 var time = 1000;
 var buttonAnimation = buttonScroll.animate([
     { transform: 'translateX(-10px)' }
@@ -60,11 +72,23 @@ buttonAnimation.pause();
 
 
 var optionsButton = document.getElementById('inner-circle');
+var optionsButtonOuter = document.getElementById('outer-circle');
+var optionsFill = getComputedStyle(optionsButton).getPropertyValue('fill');
+if ((document.querySelector('body').className) == 'light') {
+    var color1 = '#a88';
+    var color2 = '#f96';
+}
+else {
+    var color1 = '#9af';
+    var color2 = '#aef'
+}
+console.log(optionsFill);
 
 var optionsButtonAnimation = optionsButton.animate([
-    { stroke: '#5145ff'},
-    { stroke: '#9af'},
-    { stroke: '#51f'},
+    { fill: optionsFill},
+    { fill: color1},
+    { fill: color2},
+    { fill: optionsFill},
     ], {
         duration: 500
     });
@@ -84,12 +108,6 @@ export function Animate() {
 
 
 export function Options() {
-    // Change playbackRate when optionsMenuAnimation finishes,
-    // This prevents optionsAnimation from firing alone.
-    
-    // Animations return a promise object on creation, so it implicitly waits
-    // for it to finish before firing play() again.
-    
     // Change play back rate according to its 'state' (true or false) and store it in the local storage.
     // This is so we can load the animations beforehand according how the user last left them there;
     // in this case is the menu collapsed or not?
@@ -98,29 +116,31 @@ export function Options() {
     // local storage stores utf-16 strings
     if (optionsCollapsed == 'true') {
         console.log('open');
-        optionsMenuAnimation.playbackRate = -1;
         optionsCollapsed = 'false';
+        optionsMenuAnimation.playbackRate = -1;
         optionsAnimation.playbackRate = -1;
+        optionIconsAnimation.playbackRate = -1;
     }
     else {
         console.log('collapse');
         optionsMenuAnimation.playbackRate = 1;
         optionsAnimation.playbackRate = 1;
+        optionIconsAnimation.playbackRate = 1;
         optionsCollapsed = 'true';
     }
 
     optionsAnimation.play();
     optionsMenuAnimation.play();
     optionsButtonAnimation.play();
-    console.log('options collapsed? %s', optionsCollapsed);
-    console.log('????????');
+    optionIconsAnimation.play();
     localStorage.setItem('options', optionsCollapsed);
 }
 
 export function PreloadAnimations() {
     // Play the animations according to its collapsed 'state'
      
-    // Make the animation run faster so our loading screen will take the minimum time.
+    // Make the animation run faster so our loading screen will take the minimum time,
+    // and also prevent from showing the animation after the loading is done.
     // Only animate collapse since the default is the menu being open 
     
     if (optionsCollapsed == 'true') {
