@@ -1,6 +1,6 @@
 import {Animate, PreloadAnimations} from './modules/animate.js';
 
-PreloadAnimations();
+document.addEventListener('DOMContentLoaded', PreloadAnimations, false);
 Animate();
 
 import {AutoScroll, scroll, Listen} from './modules/scroll.js';

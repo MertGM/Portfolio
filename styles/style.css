@@ -3,7 +3,7 @@
   --bg-modal-primary: rgba(85,180, 255, 0.3); 
   --font-primary: #31d9f7;
   --font-secondary: #389ae0;
-  --font-secondary: #3171f7;
+  /*--font-secondary: #3171f7;*/
   --border-primary: #2f3aed;
   --btn-primary: #5145ff;
   --btn-secondary: #00a0ff;
@@ -15,10 +15,10 @@ body.light {
   --bg-modal-primary: rgba(249,248, 113, 0.3); 
   --font-primary: #31d9f7;
   --font-secondary: #389ae0;
-  --font-secondary: #3171f7;
+  /*--font-secondary: #3171f7;*/
   --border-primary: #2f3aed;
-  --btn-primary: #EFBF1F;
-  --btn-secondary: #E2641B;
+  --btn-primary: #efbf1f;
+  --btn-secondary: #e2641b;
 }
 
 label {
@@ -33,6 +33,7 @@ body {
   background-color: var(--bg-primary);
   margin: 0;
 }
+
 
 #hidden {
     display: none;
@@ -160,6 +161,7 @@ p {
   display: flex;
   height: 100%;
   width: 100%;
+  background-color: var(--bg-primary);
   flex-direction: column;
   align-items: center;
   justify-content: center;

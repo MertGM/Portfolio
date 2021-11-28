@@ -159,7 +159,7 @@ function Sum(htmlCollection, stop) {
 // Might make the EventHanlder reside in a different script file,
 // since it handles different events besides scroll
 
-export function EventHandler(event) {
+function EventHandler(event) {
     // event.target gets the previous fired event
     // This is handy when Event listener has a bubbling phase
     console.log('event %o', event);

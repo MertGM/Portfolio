@@ -1,12 +1,16 @@
-// Animation for button turning smooth scroll on and off
-// Todo: Cache the animation state, so that an animation stays where it has been left off;
-// e.g: option button stays off when refreshed instead of resetting the state.
-// Cookies would do the trick I think.
-
 var optionsMenu = document.querySelector('.options-menu');
 var optionsMenuWrapper = document.querySelector('.options-menu-wrapper');
 var options = document.querySelector('.options');
 var optionIcons = document.getElementById('options-icons');
+var moon = document.querySelector('.moon');
+var sun = document.querySelector('.sun');
+var body = document.querySelector('body');
+var optionsButton = document.getElementById('inner-circle');
+var optionsButtonOuter = document.getElementById('outer-circle');
+
+// We show the options menu at the start, because css messes up transormations.
+// Because we have flexbox css will also calculate the width and the height over time.
+// So we can't also change the width and height of an flexbox element or parent of one.
 
 var optionsMenuAnimation = optionsMenu.animate([
     { transform: 'scale(0, 0)'},
@@ -38,7 +42,6 @@ var optionIconsAnimation = optionIcons.animate([
 optionIconsAnimation.pause();
 
 
-
 var spinnerBackground = document.querySelector('.spinner');
 var spinnerBackgroundAnimation = spinnerBackground.animate([
     { opacity: 0 }
@@ -58,7 +61,6 @@ if (optionsCollapsed == null) {
 }
 
 
-
 var buttonScroll = document.querySelector('.auto-scroll');
 var time = 1000;
 var buttonAnimation = buttonScroll.animate([
@@ -70,42 +72,86 @@ var buttonAnimation = buttonScroll.animate([
     });
 buttonAnimation.pause();
 
+var optionsFill;
+var color1;
+var color2;
+var optionsButtonAnimation;
 
-var optionsButton = document.getElementById('inner-circle');
-var optionsButtonOuter = document.getElementById('outer-circle');
-var optionsFill = getComputedStyle(optionsButton).getPropertyValue('fill');
-if ((document.querySelector('body').className) == 'light') {
-    var color1 = '#a88';
-    var color2 = '#f96';
-}
-else {
-    var color1 = '#9af';
-    var color2 = '#aef'
-}
-console.log(optionsFill);
+// Initialize variables when css is done parsing
 
-var optionsButtonAnimation = optionsButton.animate([
-    { fill: optionsFill},
-    { fill: color1},
-    { fill: color2},
-    { fill: optionsFill},
+function InitButtonAnimation() {
+    optionsButton = document.getElementById('inner-circle');
+    optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
+    if ((document.querySelector('body').className) == 'light') {
+            color1 = '#a88';
+            color2 = '#f96';
+    }
+    else {
+            color1 = '#9af';
+            color2 = '#aef'
+    }
+
+    // Todo: Reinitializing might not be optimal, have to benchmark this.
+    optionsButtonAnimation = optionsButton.animate([
+            { fill: optionsFill},
+            { fill: color1},
+            { fill: color2},
+            { fill: optionsFill},
+            ], {
+                duration: 500
+        });
+    optionsButtonAnimation.pause();
+    console.log(optionsFill);
+}
+
+window.addEventListener('load', InitButtonAnimation, false);
+
+
+
+var theme = localStorage.getItem('theme');
+if (theme == null) {
+    theme = 'moon';
+}
+var moonAnimation = moon.animate([
+    {transform: 'scale(0,0)'}
     ], {
-        duration: 500
+      fill: 'forwards',
+      easing: 'ease-in-out',
+      duration: 500
     });
-optionsButtonAnimation.pause();
+moonAnimation.pause();
 
 
-// We show the options menu at the start, because css messes up transormations.
-// Because we have flexbox css will also calculate the width and the height over time.
-// So we can't also change the width and height of an flexbox element or parent of one.
+var sunAnimation = sun.animate([
+    { transform: 'scale(0,0)'}
+    ], {
+      fill: 'forwards',
+      easing: 'ease-in-out',
+      duration: 500
+    });
+sunAnimation.pause();
 
 
-
-export function Animate() {
-    buttonScroll.addEventListener('mousedown', Start, false);
-    optionsButton.addEventListener('mousedown', Options, false);
+function ThemeSwitch() {
+    if (theme == 'sun') {
+        theme = 'moon';
+        sunAnimation.playbackRate = 1;
+        moonAnimation.playbackRate = -1;
+        sunAnimation.play();
+        moonAnimation.play()
+        body.setAttribute('class', '');
+    }
+    else {
+        theme = 'sun';
+        sunAnimation.playbackRate = -1;
+        moonAnimation.playbackRate = 1;
+        moonAnimation.play();
+        sunAnimation.play()
+        body.setAttribute('class', 'light');
+    }
+    InitButtonAnimation();
+    localStorage.setItem('theme', theme);
 }
-
 
 export function Options() {
     // Change play back rate according to its 'state' (true or false) and store it in the local storage.
@@ -129,11 +175,21 @@ export function Options() {
         optionsCollapsed = 'true';
     }
 
+    InitButtonAnimation();
+
     optionsAnimation.play();
     optionsMenuAnimation.play();
     optionsButtonAnimation.play();
     optionIconsAnimation.play();
     localStorage.setItem('options', optionsCollapsed);
+}
+
+export function Animate() {
+    buttonScroll.addEventListener('mousedown', Start, false);
+    optionsButton.addEventListener('mousedown', Options, false);
+    optionsButtonOuter.addEventListener('mousedown', Options, false);
+    moon.addEventListener('mousedown', ThemeSwitch, false);
+    sun.addEventListener('mousedown', ThemeSwitch, false);
 }
 
 export function PreloadAnimations() {
@@ -160,6 +216,16 @@ export function PreloadAnimations() {
         spinnerBackgroundAnimation.finished.then(function() {
             spinnerBackground.id = 'hidden';
         });
+    }
+
+    if (theme == 'sun') {
+        moonAnimation.playbackRate = 20;
+        moonAnimation.play();
+        body.setAttribute('class', 'light');
+    }
+    else if (theme == 'moon') {
+        sunAnimation.playbackRate = 20;
+        sunAnimation.play();
     }
 
 }
