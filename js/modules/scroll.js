@@ -4,6 +4,8 @@
 //
 // 
 
+import {preferences} from './animate.js'; 
+console.log('preferences %o', preferences)
 
 // Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
@@ -38,7 +40,6 @@ var sum = 0;
 
 var navNodes = {
 }
-
 
 // Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in 'height'
 
@@ -175,13 +176,27 @@ function EventHandler(event) {
         // ticking means it's busy scrolling the page, 
         // we only start executing the function if we currently aren't scrolling scrolling.
         
-        if (!scroll.ticking) {
+        if (!scroll.ticking && preferences["autoScroll"] == 'true') {
             requestAnimationFrame(ScrollToNextNode);
         }
     }
 
     else if (event.type == 'click') {
         console.log('found a click event!');
+
+        if (preferences['autoScroll'] == 'false') {
+            scroll.ticking = true;
+            console.log('turned off auto scroll')
+
+        }
+        else {
+            scroll.ticking = false;
+            console.log('turned on auto scroll')
+        }
+        if (event.target.className == innerButton.className || event.target.className == outerButton.className) {
+            console.log('disabled auto scroll');
+            scroll.ticking = true;
+        }
         if (event.target.id == navNodes[(event.target.id + 'Id')]) {
             // Yeah... might want to make seperate objects to avoid this syntax, idk
             
@@ -229,6 +244,8 @@ function EventHandler(event) {
         
         else if (event.target.className == 'smooth-scroll') {
             console.log('Event target %o', event.target);
+
+            // Might not be optimal to request element of the DOM on every click
             const el = document.querySelector('.smooth-scroll');
             const elbody = document.querySelector('body');
             console.log('element %o', el);
@@ -280,21 +297,21 @@ export function AutoScroll() {
 // Id's and indecies get put in a hash table (object) for instant lookup.
 // A navigator is a parent element that has a bubbling phase ... 
 
-export function Listen(nav) {
+export function Listen(el, nav=false) {
     //  we create a lookup table (hash table) aka object,
     //  if we don't already have one.
     //  This is so we have instant access to the index (page) of an element (container)
     
-    if (Object.keys(navNodes).length == 0) {
-        for (var i = 0; i < nav.children.length; i++) {
-            navNodes[((nav.children[i].id) + 'Id')] = nav.children[i].id;
-            navNodes[((nav.children[i].id) + 'Index')] = i;
+    if (((Object.keys(navNodes).length == 0) && nav == true)) {
+        for (var i = 0; i < el.children.length; i++) {
+            navNodes[((el.children[i].id) + 'Id')] = el.children[i].id;
+            navNodes[((el.children[i].id) + 'Index')] = i;
         }
+        console.log('navNodes %o', navNodes);
+        console.log('home id %o', navNodes.homeId);
+        console.log('home index %o', navNodes.homeIndex);
     }
 
-    console.log('navNodes %o', navNodes);
-    console.log('home id %o', navNodes.homeId);
-    console.log('home index %o', navNodes.homeIndex);
-
-    nav.addEventListener('click', EventHandler, false);
+    console.log('Added event listener on %o', el);
+    el.addEventListener('click', EventHandler, false);
 }

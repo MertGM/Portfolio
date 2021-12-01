@@ -7,6 +7,9 @@
   --border-primary: #2f3aed;
   --btn-primary: #5145ff;
   --btn-secondary: #00a0ff;
+  --btn-on: #0f5;
+  --btn-off: #f25;
+  --btn-slider: #aaf;
   --green0: #2fedd7;
 }
 
@@ -79,6 +82,21 @@ p {
     z-index: 1;
     pointer-events: none;
     margin-top: 1em;
+}
+
+.inner-button {
+    fill: var(--btn-slider);
+    stroke: #aff;
+    pointer-events: fill;
+    cursor: pointer;
+}
+
+.outer-button {
+    fill: var(--btn-on);
+    pointer-events: fill;
+    stroke-width: 1.5px;
+    stroke: #0a5;
+    cursor: pointer;
 }
 
 #outer-circle {

@@ -12,6 +12,7 @@ var optionsButtonOuter = document.getElementById('outer-circle');
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
 
+export var preferences = {};
 var optionsMenuAnimation = optionsMenu.animate([
     { transform: 'scale(0, 0)'},
     ], {
@@ -60,17 +61,34 @@ if (optionsCollapsed == null) {
     optionsCollapsed = false;
 }
 
+var autoScroll = localStorage.getItem('auto scroll');
+console.log('auto scroll %s', autoScroll);
+console.log(optionsCollapsed);
+if (autoScroll == null) {
+    // Auto scroll is enabled by default
+    autoScroll = 'true';
+}
 
-var buttonScroll = document.querySelector('.auto-scroll');
-var time = 1000;
+var buttonScroll = document.querySelector('.inner-button');
+var buttonScrollOuter = document.querySelector('.outer-button');
 var buttonAnimation = buttonScroll.animate([
-    { transform: 'translateX(-10px)' }
+    { transform: 'translateX(-14px)' }
     ], {
       fill: 'forwards',
       easing: 'ease-in-out',
-      duration: time
+      duration: 600
     });
 buttonAnimation.pause();
+
+var buttonFillAnimation = buttonScrollOuter.animate([
+    { fill: '#0f5' },
+    { fill: '#f25' }
+    ], {
+      fill: 'forwards',
+      easing: 'ease-in-out',
+      duration: 500
+    });
+buttonFillAnimation.pause();
 
 var optionsFill;
 var color1;
@@ -90,6 +108,7 @@ function InitButtonAnimation() {
             color1 = '#9af';
             color2 = '#aef'
     }
+
 
     // Todo: Reinitializing might not be optimal, have to benchmark this.
     optionsButtonAnimation = optionsButton.animate([
@@ -186,6 +205,7 @@ export function Options() {
 
 export function Animate() {
     buttonScroll.addEventListener('mousedown', Start, false);
+    buttonScrollOuter.addEventListener('mousedown', Start, false);
     optionsButton.addEventListener('mousedown', Options, false);
     optionsButtonOuter.addEventListener('mousedown', Options, false);
     moon.addEventListener('mousedown', ThemeSwitch, false);
@@ -228,23 +248,42 @@ export function PreloadAnimations() {
         sunAnimation.play();
     }
 
+    console.log('autoooooo %s', autoScroll);
+    if (autoScroll == 'false')
+    {
+        console.log('autoooooo %s', autoScroll);
+        // We can't do this instantly afaik
+        buttonAnimation.playbackRate = 20;
+        buttonAnimation.play();
+        buttonFillAnimation.playbackRate = 20;
+        buttonFillAnimation.play();
+    }
+
+    preferences["autoScroll"] = autoScroll;
 }
 
 function Start() {
-    console.log(buttonAnimation.currentTime);
+    /*console.log(buttonAnimation.currentTime);
     console.log(buttonAnimation.playbackRate);
-    console.log(buttonAnimation.effect);
-    if (buttonAnimation.currentTime == time) {
-        buttonAnimation.playbackRate = -1;
+    console.log(buttonAnimation.effect);*/
+    
+    if (autoScroll == 'true') {
+        console.log('Swipe left')
+        buttonAnimation.playbackRate = 1;
         buttonAnimation.play()
+        buttonFillAnimation.playbackRate = 1;
+        buttonFillAnimation.play();
+        autoScroll = 'false';
     }
     else {
-        buttonAnimation.playbackRate = 1;
+        console.log('Swipe right')
+        buttonAnimation.playbackRate = -1;
         buttonAnimation.play();
+        buttonFillAnimation.playbackRate = -1;
+        buttonFillAnimation.play();
+        autoScroll = 'true';
     }
-}
-function End() {
-    console.log(buttonAnimation.currentTime);
 
-    console.log('End animation');
+    localStorage.setItem('auto scroll', autoScroll);
+    preferences["autoScroll"] = autoScroll;
 }
