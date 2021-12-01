@@ -184,19 +184,18 @@ function EventHandler(event) {
     else if (event.type == 'click') {
         console.log('found a click event!');
 
-        if (preferences['autoScroll'] == 'false') {
-            scroll.ticking = true;
-            console.log('turned off auto scroll')
-
+        if (event.target.className == 'outer-button' || event.target.className == 'inner-button') {
+            if (preferences['autoScroll'] == 'false') {
+                scroll.ticking = true;
+                console.log('turned off auto scroll')
+            }
         }
+
         else {
             scroll.ticking = false;
             console.log('turned on auto scroll')
         }
-        if (event.target.className == innerButton.className || event.target.className == outerButton.className) {
-            console.log('disabled auto scroll');
-            scroll.ticking = true;
-        }
+
         if (event.target.id == navNodes[(event.target.id + 'Id')]) {
             // Yeah... might want to make seperate objects to avoid this syntax, idk
             

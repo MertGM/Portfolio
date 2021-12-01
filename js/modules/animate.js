@@ -20,7 +20,7 @@ var optionsMenuAnimation = optionsMenu.animate([
     ], {
         fill: 'forwards',
         easing: 'ease-in-out',
-        duration: 1500
+        duration: 1200
     });
 optionsMenuAnimation.pause();
 
