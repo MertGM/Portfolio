@@ -15,7 +15,6 @@ export var scroll = {
     currentScrollY: 0,
 
     // This is a "reference" (shallow copy) of the body's HTMLCollection.
-    // The -1 removes the script element from the array.
     
     node: Array.from(document.body.children),
     index: 0,
@@ -23,6 +22,7 @@ export var scroll = {
     active: false,
 
 };
+
 
 // RequestAnimationFrame doesn't accept arguments, so for now
 // these variables are global.
@@ -39,6 +39,7 @@ var sum = 0;
 // Since the syntax gets cumbersome.
 
 var navNodes = {
+    id: {},
 }
 
 // Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in 'height'
@@ -166,9 +167,30 @@ function EventHandler(event) {
     console.log('event %o', event);
     console.log('event target %o', event.target);
     console.log('event target id %s', event.target.id);
-    console.log('nav outside handler: %s', navNodes[(event.target.id + 'Id')]);
+    console.log('nav outside handler: %s', navNodes.id[event.target.id]);
 
     if (event.type == 'scroll' && event.target == document) {
+
+        // because we don't store the 0, the height of the root, we need to look ahead
+        // +1 or -1.
+        
+        // Atm it does not capture the last node, but the first it does if your scrollbar is fully up
+        
+        if (window.scrollY >= scroll.node.y[scroll.index+1]) {
+
+            // Reset the background color to it's 'non active' color
+            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+            scroll.index++;
+            console.log('index %s', scroll.index);
+        }
+        else if (window.scrollY <= scroll.node.y[scroll.index-1]) {
+            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+            scroll.index--;
+            console.log('index %s', scroll.index);
+        }
+        
+        console.log("current node %s", navNodes.id.array[scroll.index]);
+        document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 20, 0, 0.5)';
 
         // Because of the scroll event firing rapidly due to events being asynchronous,
         // which results in the event being fired, even during a function call in the event,
@@ -196,10 +218,10 @@ function EventHandler(event) {
             console.log('turned on auto scroll')
         }
 
-        if (event.target.id == navNodes[(event.target.id + 'Id')]) {
+        if (event.target.id == navNodes.id[event.target.id]) {
             // Yeah... might want to make seperate objects to avoid this syntax, idk
             
-            console.log('nav found in handler: %s', navNodes[(event.target.id + 'Id')]);
+            console.log('nav found in handler: %s', navNodes.id[event.target.id]);
             var displacement = 0;
 
             for (var i = 0; i < scroll.node.length; i++) {
@@ -211,7 +233,7 @@ function EventHandler(event) {
                 }
                 console.log('class list %o', classes);
                 for (var j = 0; j < classes.length; j++) {
-                    if (classes[j] == navNodes[(event.target.id + 'Id')]) {
+                    if (classes[j] == navNodes.id[event.target.id]) {
                         displacement = i - scroll.index;
                         scroll.index = i;
                         console.log('class index %s', i);
@@ -219,12 +241,6 @@ function EventHandler(event) {
                     }
                 }
             }
-            //const displacement = ((navNodes[(event.target.id + 'Index')]) - scroll.index);
-            //scroll.index = navNodes[(event.target.id + 'Index')];
-
-            //console.log('displacement %s', displacement);
-            //console.log('nav node +1 %s', (navNodes[(event.target.id + 'Index')]) +1);
-            //console.log('scroll index +1 %s', (scroll.index) +1);
 
             if (displacement < 0) {
                 requestAnimationFrame(Scrollup);
@@ -301,14 +317,37 @@ export function Listen(el, nav=false) {
     //  if we don't already have one.
     //  This is so we have instant access to the index (page) of an element (container)
     
-    if (((Object.keys(navNodes).length == 0) && nav == true)) {
+    if ((Object.keys(navNodes.id).length == 0) && nav == true) {
         for (var i = 0; i < el.children.length; i++) {
-            navNodes[((el.children[i].id) + 'Id')] = el.children[i].id;
-            navNodes[((el.children[i].id) + 'Index')] = i;
+            navNodes.id[(el.children[i].id)] = el.children[i].id;
         }
-        console.log('navNodes %o', navNodes);
-        console.log('home id %o', navNodes.homeId);
-        console.log('home index %o', navNodes.homeIndex);
+
+        var nav = Object.keys(navNodes.id);
+        console.log("navs %o", navNodes.id);
+
+        
+        var node = [];
+        var m = 0;
+        console.log('node id %o', scroll.node[3]);
+        for (var j = 0; j < scroll.node.length; j++) {
+            var classname = scroll.node[j].classList;
+            if (classname != undefined) {
+                for (var k = 0; k < classname.length; k++) {
+                    //console.log(classname[k]);
+                    //console.log(nav[j]);
+                    if (nav[m] == classname[k]) {
+                        //console.log('found matching id %s', classname[k]);
+
+                        // Sum the height of the elements up to the node aka parent node
+                        node.push(Sum(scroll.node, j-1));
+                        m++;
+                    }
+                }
+            }
+        }
+
+        scroll.node.y = node;
+        navNodes.id.array = Object.keys(navNodes.id);
     }
 
     console.log('Added event listener on %o', el);
