@@ -6,13 +6,15 @@ var moon = document.querySelector('.moon');
 var sun = document.querySelector('.sun');
 var body = document.querySelector('body');
 var optionsButton = document.getElementById('inner-circle');
-var optionsButtonOuter = document.getElementById('outer-circle');
+var optionsOuterButton = document.getElementById('outer-circle');
+
+// User preferences on animation functions
+export var preferences = {};
 
 // We show the options menu at the start, because css messes up transormations.
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
 
-export var preferences = {};
 var optionsMenuAnimation = optionsMenu.animate([
     { transform: 'scale(0, 0)'},
     ], {
@@ -94,11 +96,13 @@ var optionsFill;
 var color1;
 var color2;
 var optionsButtonAnimation;
+var optionsOuterButtonAnimation;
 
 // Initialize variables when css is done parsing
 
 function InitButtonAnimation() {
     optionsButton = document.getElementById('inner-circle');
+    optionsOuterButton = document.getElementById('outer-circle');
     optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
     if ((document.querySelector('body').className) == 'light') {
             color1 = '#a88';
@@ -120,11 +124,20 @@ function InitButtonAnimation() {
                 duration: 500
         });
     optionsButtonAnimation.pause();
+
+    optionsOuterButtonAnimation = optionsOuterButton.animate([
+            { stroke: optionsFill},
+            { stroke: color1},
+            { stroke: color2},
+            { stroke: optionsFill},
+            ], {
+                duration: 500
+        });
+    optionsOuterButtonAnimation.pause();
     console.log(optionsFill);
 }
 
 window.addEventListener('load', InitButtonAnimation, false);
-
 
 
 var theme = localStorage.getItem('theme');
@@ -172,13 +185,15 @@ function ThemeSwitch() {
     localStorage.setItem('theme', theme);
 }
 
-export function Options() {
+export function Options(e) {
     // Change play back rate according to its 'state' (true or false) and store it in the local storage.
     // This is so we can load the animations beforehand according how the user last left them there;
     // in this case is the menu collapsed or not?
     // This allows us to replicate caching an animation state
     
     // local storage stores utf-16 strings
+    console.log(e.currentTarget);
+
     if (optionsCollapsed == 'true') {
         console.log('open');
         optionsCollapsed = 'false';
@@ -194,12 +209,19 @@ export function Options() {
         optionsCollapsed = 'true';
     }
 
+
     InitButtonAnimation();
 
     optionsAnimation.play();
     optionsMenuAnimation.play();
-    optionsButtonAnimation.play();
     optionIconsAnimation.play();
+
+    if (e.currentTarget.id == 'outer-circle') {
+        optionsOuterButtonAnimation.play();
+    }
+    else {
+        optionsButtonAnimation.play();
+    }
     localStorage.setItem('options', optionsCollapsed);
 }
 
@@ -207,7 +229,7 @@ export function Animate() {
     buttonScroll.addEventListener('mousedown', Start, false);
     buttonScrollOuter.addEventListener('mousedown', Start, false);
     optionsButton.addEventListener('mousedown', Options, false);
-    optionsButtonOuter.addEventListener('mousedown', Options, false);
+    optionsOuterButton.addEventListener('mousedown', Options, false);
     moon.addEventListener('mousedown', ThemeSwitch, false);
     sun.addEventListener('mousedown', ThemeSwitch, false);
 }
