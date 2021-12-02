@@ -29,6 +29,7 @@ export var scroll = {
 
 var t = 0;
 var sum = 0;
+var clickedNode = false;
 
 // Hash table to an id and index lookup of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
@@ -83,14 +84,24 @@ function Scrolldown() {
     // e.g: on reloading the page at a specific location, the page will stay on the previous location.
     // Our algorithm thinks it will always start at the top of the page (the first container).
     
-    // Only calculate the sum on the first call of this function
+
+    // if we call this function via a click event, then ticking is false
+    
+
     if (!scroll.ticking) {
-        sum = Sum(scroll.node, scroll.index);
+        sum = scroll.node.y[scroll.index];
         scroll.ticking = true;
     }
 
+    if (clickedNode) {
+        scroll.currentScrollY = window.scrollY;
+        clickedNode = false;
+        console.log('click');
+    }
+    console.log('sum %s', sum);
+    console.log('index %s', scroll.index);
+    
     if (scroll.currentScrollY >= sum) {
-         
         scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
@@ -119,17 +130,24 @@ function Scrolldown() {
 function Scrollup() {
 
     if (!scroll.ticking) {
-        sum = Sum(scroll.node, scroll.index);
+        sum = scroll.node.y[scroll.index];
         scroll.ticking = true;
     }
 
+    if (clickedNode) {
+        scroll.currentScrollY = window.scrollY;
+        clickedNode = false;
+        console.log('click');
+    }
 
+    console.log('sum %s', sum);
     if (scroll.currentScrollY <= sum) {
          
         scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
         scroll.ticking = false;
+        clickedNode = false;
         return;
 
     }
@@ -158,6 +176,23 @@ function Sum(htmlCollection, stop) {
     return x;
 }
 
+
+function CurrentNode() {
+        var yOffset = 25;
+        if ((window.scrollY >= (scroll.node.y[scroll.index+1]) - yOffset)) {
+
+            // Reset the background color to it's 'non active' color
+            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+            scroll.index++;
+            console.log('index %s', scroll.index);
+        }
+        else if ((window.scrollY <= (scroll.node.y[scroll.index] - yOffset)) && scroll.index > 0) {
+            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+            scroll.index--;
+            console.log('index %s', scroll.index);
+        }
+}
+
 // Might make the EventHanlder reside in a different script file,
 // since it handles different events besides scroll
 
@@ -170,24 +205,7 @@ function EventHandler(event) {
     console.log('nav outside handler: %s', navNodes.id[event.target.id]);
 
     if (event.type == 'scroll' && event.target == document) {
-
-        // because we don't store the 0, the height of the root, we need to look ahead
-        // +1 or -1.
-        
-        // Atm it does not capture the last node, but the first it does if your scrollbar is fully up
-        
-        if (window.scrollY >= scroll.node.y[scroll.index+1]) {
-
-            // Reset the background color to it's 'non active' color
-            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
-            scroll.index++;
-            console.log('index %s', scroll.index);
-        }
-        else if (window.scrollY <= scroll.node.y[scroll.index-1]) {
-            document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
-            scroll.index--;
-            console.log('index %s', scroll.index);
-        }
+        CurrentNode();
         
         console.log("current node %s", navNodes.id.array[scroll.index]);
         document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 20, 0, 0.5)';
@@ -219,68 +237,31 @@ function EventHandler(event) {
         }
 
         if (event.target.id == navNodes.id[event.target.id]) {
-            // Yeah... might want to make seperate objects to avoid this syntax, idk
-            
+
             console.log('nav found in handler: %s', navNodes.id[event.target.id]);
             var displacement = 0;
+            //CurrentNode();
 
-            for (var i = 0; i < scroll.node.length; i++) {
-                var classes = scroll.node[i].classList;
-
-                // element with no class name
-                if (classes == undefined) {
-                    continue;
-                }
-                console.log('class list %o', classes);
-                for (var j = 0; j < classes.length; j++) {
-                    if (classes[j] == navNodes.id[event.target.id]) {
-                        displacement = i - scroll.index;
-                        scroll.index = i;
-                        console.log('class index %s', i);
-                        console.log('element %o', classes[j]);
-                    }
+            for (var i = 0; i < navNodes.id.array.length; i++) {
+                if (event.target.id == navNodes.id.array[i]) {
+                    displacement = i - scroll.index;
+                    scroll.index = i;
                 }
             }
 
+            console.log('displacement %s', displacement);
             if (displacement < 0) {
+                clickedNode = true;
+                console.log('going to scroll up');
                 requestAnimationFrame(Scrollup);
             }
 
             else if (displacement > 0) {
+                clickedNode = true;
+                console.log('going to scroll down');
                 requestAnimationFrame(Scrolldown);
             }
         }
-        
-        // TODO: Might want to set a bitfield with flags to avoid nested if statements
-
-        // Checking for className doesn't work on svg elements,
-        // because it gives us a SVGAnimatedString instead unlike a normal html element
-        
-        
-        else if (event.target.className == 'smooth-scroll') {
-            console.log('Event target %o', event.target);
-
-            // Might not be optimal to request element of the DOM on every click
-            const el = document.querySelector('.smooth-scroll');
-            const elbody = document.querySelector('body');
-            console.log('element %o', el);
-            console.log('element %o', elbody);
-
-            if (el.id == 'on') {
-                el.id = 'off';
-
-                // Ticking true does not mean it's scrolling in this context;
-                // we set it to true to not listen in the AutoScroll function
-                
-                scroll.ticking = true;
-            }
-
-            else if (el.id == 'off') {
-                el.id = 'on';
-                scroll.ticking = false;
-            }
-        }
-
         
         else if (event.target.className == 'theme') {
             console.log('Event target %o', event.target);
