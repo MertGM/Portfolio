@@ -2,7 +2,10 @@
 //
 // TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
-// 
+// TODO: Make scrolling to current index + > 1 transition close to destination's height relative to 
+// root (start height, 0), instead of this irritating fast scroll.
+//
+// TODO: Draw greetings on the landing page aka root
 
 import {preferences} from './animate.js'; 
 console.log('preferences %o', preferences)
@@ -10,7 +13,6 @@ console.log('preferences %o', preferences)
 // Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
 export var scroll = {
-    scrolledY: 0,
     prevScrollY: document.documentElement.scrollTop,
     currentScrollY: 0,
 
@@ -48,26 +50,41 @@ var navNodes = {
 scroll.node.unshift({clientHeight: 0});
 console.log(scroll.node);
 
+// Check what the index is on page load, so that when you refresh at a certain position,
+// the index will get set.
+function SetCurrentIndex() {
+    console.log('prevscrolly %s', scroll.prevScrollY);
+    for (var i = 0; i < scroll.node.y.length; i++) {
+        console.log(scroll.node.y[i]);
+        if (scroll.node.y[i] >= scroll.prevScrollY) {
+            console.log('index: %s', i)
+            scroll.index = i;
+            return;
+        }
+    }
+}
+
+window.addEventListener('load', SetCurrentIndex, false);
 
 function ScrollToNextNode() {
-    scroll.scrolledY = document.documentElement.scrollTop;
+    scroll.currentScrollY = document.documentElement.scrollTop;
 
     console.log('scroll obj %o', scroll);
     console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-    console.log('scrolledY ' + scroll.scrolledY);
+    console.log('currentScrollY ' + scroll.currentScrollY);
     console.log('scroll' + scroll.index);
     console.log('node obj %o', scroll.node);
 
-        if (scroll.scrolledY > scroll.prevScrollY) {
+        if (scroll.currentScrollY > scroll.prevScrollY) {
             // Include the index of the page below (relative to the current page) beforehand,
             // to calculate the sum in the scrolldown function
-            scroll.index += 1;
+            if (scroll.index != scroll.node.y.length) {scroll.index += 1;}
             Scrolldown();
         }
 
-        else if (scroll.scrolledY < scroll.prevScrollY) {
+        else if (scroll.currentScrollY < scroll.prevScrollY) {
             // Same reason as above
-            scroll.index -= 1;
+            if (scroll.index != 0) {scroll.index -= 1;}
             Scrollup();
         }
 }
@@ -87,35 +104,41 @@ function Scrolldown() {
 
     // if we call this function via a click event, then ticking is false
     
-
-    if (!scroll.ticking) {
+    if (!scroll.ticking || clickedNode) {
         sum = scroll.node.y[scroll.index];
         scroll.ticking = true;
-    }
-
-    if (clickedNode) {
-        scroll.currentScrollY = window.scrollY;
         clickedNode = false;
+        scroll.currentScrollY = window.scrollY;
+
+        // Have as starting point the current scroll y, so that we can 
+        // smoothly scroll to the destination
+        scroll.prevScrollY = scroll.currentScrollY;
         console.log('click');
+        console.log('Sum %c%s  ', 'color: green;', sum);
+        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
     }
-    console.log('sum %s', sum);
-    console.log('index %s', scroll.index);
     
     if (scroll.currentScrollY >= sum) {
         scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
         scroll.ticking = false;
+        scroll.prevScrollY
+        console.log('done scrolling');
+        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+        console.log('prev scroll y %c%s  ', 'color: red;', scroll.prevScrollY);
         return;
-
     }
 
+    console.log('index %s', scroll.index);
     console.log('Sum %c%s  ', 'color: blue;', sum);
 
 
-    // Placeholder values, easing can be smoother than it is.
+    // Having the control point closer to the some makes scrolling ease out
+    // and further ease in.
+    // The default atm is ease out.
     
-    scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY +600, sum);
+    scroll.currentScrollY = Easein(scroll.prevScrollY, sum - 100, sum);
     t+= 0.02;
 
 
@@ -128,36 +151,38 @@ function Scrolldown() {
 
 
 function Scrollup() {
-
-    if (!scroll.ticking) {
+    if (!scroll.ticking || clickedNode) {
         sum = scroll.node.y[scroll.index];
         scroll.ticking = true;
-    }
-
-    if (clickedNode) {
-        scroll.currentScrollY = window.scrollY;
         clickedNode = false;
+        scroll.currentScrollY = window.scrollY;
+        scroll.prevScrollY = scroll.currentScrollY;
         console.log('click');
+        console.log('Sum %c%s  ', 'color: green;', sum);
+        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
     }
 
-    console.log('sum %s', sum);
     if (scroll.currentScrollY <= sum) {
-         
-        scroll.prevScrollY = scroll.currentScrollY;
         t = 0;
         // End of scrolling
         scroll.ticking = false;
         clickedNode = false;
+
+        scroll.prevScrollY = scroll.currentScrollY;
+        console.log('done scrolling');
+        console.log('Sum %c%s  ', 'color: green;', sum);
+        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         return;
 
     }
 
+    console.log('index %s', scroll.index);
     console.log('Sum %c%s  ', 'color: blue;', sum);
 
 
     // Placeholder values, easing can be smoother than it is.
     
-    scroll.currentScrollY = Easein(scroll.prevScrollY, scroll.prevScrollY -600, sum);
+    scroll.currentScrollY = Easein(scroll.prevScrollY, sum + 100, sum);
     t+= 0.02;
 
 
@@ -178,17 +203,21 @@ function Sum(htmlCollection, stop) {
 
 
 function CurrentNode() {
+        // Offset so that >= and <= don't collapse
         var yOffset = 25;
-        if ((window.scrollY >= (scroll.node.y[scroll.index+1]) - yOffset)) {
+        if (window.scrollY >= ((scroll.node.y[scroll.index+1]) - yOffset)) {
 
             // Reset the background color to it's 'non active' color
             document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+            console.log('changed color');
             scroll.index++;
             console.log('index %s', scroll.index);
         }
-        else if ((window.scrollY <= (scroll.node.y[scroll.index] - yOffset)) && scroll.index > 0) {
+        // Bug: This doesn't get detected when scrolling up
+        else if ((window.scrollY <= ((scroll.node.y[scroll.index]) - yOffset))) {
             document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
             scroll.index--;
+            console.log('changed color');
             console.log('index %s', scroll.index);
         }
 }
@@ -217,6 +246,7 @@ function EventHandler(event) {
         // we only start executing the function if we currently aren't scrolling scrolling.
         
         if (!scroll.ticking && preferences["autoScroll"] == 'true') {
+            console.log('error');
             requestAnimationFrame(ScrollToNextNode);
         }
     }
@@ -224,15 +254,16 @@ function EventHandler(event) {
     else if (event.type == 'click') {
         console.log('found a click event!');
 
-        if (event.target.className == 'outer-button' || event.target.className == 'inner-button') {
-            if (preferences['autoScroll'] == 'false') {
-                scroll.ticking = true;
-                console.log('turned off auto scroll')
-            }
+        if (preferences['autoScroll'] == 'false') {
+            scroll.ticking = true;
+            console.log('turned off auto scroll')
         }
 
-        else {
+        else if (preferences['autoScroll'] == 'true') {
             scroll.ticking = false;
+            // Save the current window scroll y when activating auto scroll enabled,
+            // so that when you scroll it will be able to compare prevscrollY with currentScrollY
+            scroll.prevScrollY = window.scrollY;
             console.log('turned on auto scroll')
         }
 
@@ -240,12 +271,18 @@ function EventHandler(event) {
 
             console.log('nav found in handler: %s', navNodes.id[event.target.id]);
             var displacement = 0;
-            //CurrentNode();
 
             for (var i = 0; i < navNodes.id.array.length; i++) {
                 if (event.target.id == navNodes.id.array[i]) {
+                    scroll.prevScrollY = scroll.node.y[scroll.index];
                     displacement = i - scroll.index;
-                    scroll.index = i;
+                    if (displacement < 0) {
+                        // This makes sure the current index node changes its color,
+                        // as currentNode doesn't detect <=, sometimes.
+                        document.getElementById((navNodes.id.array[scroll.index])).style.background = 
+                            'rgba(255, 0, 100, 0.5)';
+                    }
+                    scroll.index += displacement;
                 }
             }
 
@@ -328,6 +365,7 @@ export function Listen(el, nav=false) {
         }
 
         scroll.node.y = node;
+        console.log("%o", scroll.node.y);
         navNodes.id.array = Object.keys(navNodes.id);
     }
 
