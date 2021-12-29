@@ -2,9 +2,6 @@
 //
 // TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
-// TODO: Make scrolling to current index + > 1 transition close to destination's height relative to 
-// root (start height, 0), instead of this irritating fast scroll.
-//
 // TODO: Draw greetings on the landing page aka root
 
 import {preferences} from './animate.js'; 
@@ -45,13 +42,15 @@ var navNodes = {
     id: {},
 }
 
-// Add a new object to the HTMLCollection that includes the height of the top page, which is '0' in 'height'
+// We need a base height of 0 to be able to scroll from the root
+// to the subsequent container
 
 scroll.node.unshift({clientHeight: 0});
 console.log(scroll.node);
 
 // Check what the index is on page load, so that when you refresh at a certain position,
-// the index will get set.
+// the index corresponds to the container.
+
 function SetCurrentIndex() {
     console.log('prevscrolly %s', scroll.prevScrollY);
     for (var i = 0; i < scroll.node.y.length; i++) {
@@ -75,16 +74,14 @@ function ScrollToNextNode() {
     console.log('scroll' + scroll.index);
     console.log('node obj %o', scroll.node);
 
+        // Bug: Scroll function sets current.ScrollY multiple times if scrolling happens too fast.
+        // Could be because of recursion?
+    
         if (scroll.currentScrollY > scroll.prevScrollY) {
-            // Include the index of the page below (relative to the current page) beforehand,
-            // to calculate the sum in the scrolldown function
-            if (scroll.index != scroll.node.y.length) {scroll.index += 1;}
             Scrolldown();
         }
 
         else if (scroll.currentScrollY < scroll.prevScrollY) {
-            // Same reason as above
-            if (scroll.index != 0) {scroll.index -= 1;}
             Scrollup();
         }
 }
@@ -96,101 +93,103 @@ function Easein(p0,p1,p2) {
     return p;
 }
 
-function Scrolldown() {
-    // Todo: Scroll function doesn't acknowledge the page starting somewhere but the first container;
-    // e.g: on reloading the page at a specific location, the page will stay on the previous location.
-    // Our algorithm thinks it will always start at the top of the page (the first container).
-    
+function Scrolldown(dis=1) {
+    function Loop() {
+        // if we call this function via a click event, then ticking is false
+        
+        if (!scroll.ticking || clickedNode) {
+            scroll.ticking = true;
+            clickedNode = false;
+            sum = scroll.node.y[scroll.index+dis];
+            scroll.currentScrollY = window.scrollY;
 
-    // if we call this function via a click event, then ticking is false
-    
-    if (!scroll.ticking || clickedNode) {
-        sum = scroll.node.y[scroll.index];
-        scroll.ticking = true;
-        clickedNode = false;
-        scroll.currentScrollY = window.scrollY;
+            // Have as starting point the current scroll y, so that we can 
+            // smoothly scroll to the destination
+            scroll.prevScrollY = scroll.currentScrollY;
+            console.log('click');
+            console.log('Sum %c%s  ', 'color: green;', sum);
+            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+        }
 
-        // Have as starting point the current scroll y, so that we can 
-        // smoothly scroll to the destination
-        scroll.prevScrollY = scroll.currentScrollY;
-        console.log('click');
-        console.log('Sum %c%s  ', 'color: green;', sum);
-        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+        console.log('index %s', scroll.index);
+        console.log('Sum %c%s  ', 'color: blue;', sum);
+        console.log('dis %c%s  ', 'color: red;', dis);
+
+
+        // Having the control point closer to the destination makes scrolling ease out
+        // and further ease in.
+        // The default atm is ease out.
+        
+        if (scroll.currentScrollY >= sum) {
+            // End of scrolling
+            //CurrentNode();
+            t = 0;
+            scroll.prevScrollY = scroll.currentScrollY;
+            scroll.ticking = false;
+            scroll.index += dis;
+            console.log('done scrolling');
+            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+            console.log('prev scroll y %c%s  ', 'color: red;', scroll.prevScrollY);
+            return;
+        }
+
+        scroll.currentScrollY = Easein(scroll.prevScrollY, sum - 100, sum);
+        t+= 0.02;
+
+
+        console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+        console.log('scroll.currentScrollY ' + scroll.currentScrollY);
+        console.log('scrolled down');
+
+        requestAnimationFrame(Loop);
     }
-    
-    if (scroll.currentScrollY >= sum) {
-        scroll.prevScrollY = scroll.currentScrollY;
-        t = 0;
-        // End of scrolling
-        scroll.ticking = false;
-        scroll.prevScrollY
-        console.log('done scrolling');
-        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
-        console.log('prev scroll y %c%s  ', 'color: red;', scroll.prevScrollY);
-        return;
-    }
 
-    console.log('index %s', scroll.index);
-    console.log('Sum %c%s  ', 'color: blue;', sum);
-
-
-    // Having the control point closer to the some makes scrolling ease out
-    // and further ease in.
-    // The default atm is ease out.
-    
-    scroll.currentScrollY = Easein(scroll.prevScrollY, sum - 100, sum);
-    t+= 0.02;
-
-
-    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-    console.log('scroll.currentScrollY ' + scroll.currentScrollY);
-    console.log('scrolled down');
-
-    requestAnimationFrame(Scrolldown);
+    requestAnimationFrame(Loop);
 }
 
 
-function Scrollup() {
-    if (!scroll.ticking || clickedNode) {
-        sum = scroll.node.y[scroll.index];
-        scroll.ticking = true;
-        clickedNode = false;
-        scroll.currentScrollY = window.scrollY;
-        scroll.prevScrollY = scroll.currentScrollY;
-        console.log('click');
-        console.log('Sum %c%s  ', 'color: green;', sum);
-        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+function Scrollup(dis=-1) {
+    function Loop() {
+        if (!scroll.ticking|| clickedNode) {
+            scroll.ticking = true;
+            clickedNode = false;
+            sum = scroll.node.y[scroll.index+dis];
+            scroll.currentScrollY = window.scrollY;
+            scroll.prevScrollY = scroll.currentScrollY;
+            console.log('click');
+            console.log('Sum %c%s  ', 'color: green;', sum);
+            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+        }
+
+        console.log('index %s', scroll.index);
+        console.log('Sum %c%s  ', 'color: blue;', sum);
+
+
+        if (scroll.currentScrollY <= sum) {
+            // End of scrolling
+            //CurrentNode();
+            t = 0;
+            scroll.prevScrollY = scroll.currentScrollY;
+            scroll.ticking = false;
+            scroll.index += dis;
+            console.log('done scrolling');
+            console.log('Sum %c%s  ', 'color: green;', sum);
+            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+            return;
+
+        }
+
+        scroll.currentScrollY = Easein(scroll.prevScrollY, sum + 100, sum);
+        t+= 0.02;
+
+
+        console.log('scroll.prevScrollY ' + scroll.prevScrollY);
+        console.log('scroll.currentScrollY ' + scroll.currentScrollY);
+        console.log('scrolled up');
+
+        requestAnimationFrame(Loop);
     }
-
-    if (scroll.currentScrollY <= sum) {
-        t = 0;
-        // End of scrolling
-        scroll.ticking = false;
-        clickedNode = false;
-
-        scroll.prevScrollY = scroll.currentScrollY;
-        console.log('done scrolling');
-        console.log('Sum %c%s  ', 'color: green;', sum);
-        console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
-        return;
-
-    }
-
-    console.log('index %s', scroll.index);
-    console.log('Sum %c%s  ', 'color: blue;', sum);
-
-
-    // Placeholder values, easing can be smoother than it is.
-    
-    scroll.currentScrollY = Easein(scroll.prevScrollY, sum + 100, sum);
-    t+= 0.02;
-
-
-    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-    console.log('scroll.currentScrollY ' + scroll.currentScrollY);
-    console.log('scrolled up');
-
-    requestAnimationFrame(Scrollup);
+    requestAnimationFrame(Loop);
 }
 
 function Sum(htmlCollection, stop) {
@@ -203,22 +202,28 @@ function Sum(htmlCollection, stop) {
 
 
 function CurrentNode() {
-        // Offset so that >= and <= don't collapse
-        var yOffset = 25;
+        var yOffset = 50;
         if (window.scrollY >= ((scroll.node.y[scroll.index+1]) - yOffset)) {
 
             // Reset the background color to it's 'non active' color
             document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
-            console.log('changed color');
-            scroll.index++;
+            document.getElementById((navNodes.id.array[scroll.index+1])).style.background = 'rgba(255, 20, 0, 0.5)';
+            console.log('changed color on scroll down');
             console.log('index %s', scroll.index);
+
+            // Change index if page is scrolling without auto scroll
+            if (!scroll.ticking) {scroll.index++;}
         }
-        // Bug: This doesn't get detected when scrolling up
+
         else if ((window.scrollY <= ((scroll.node.y[scroll.index]) - yOffset))) {
+
             document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
-            scroll.index--;
-            console.log('changed color');
+            document.getElementById((navNodes.id.array[scroll.index-1])).style.background = 'rgba(255, 20, 0, 0.5)';
+            console.log('changed color on scroll up');
             console.log('index %s', scroll.index);
+
+            if (!scroll.ticking) {scroll.index--;}
+
         }
 }
 
@@ -234,10 +239,6 @@ function EventHandler(event) {
     console.log('nav outside handler: %s', navNodes.id[event.target.id]);
 
     if (event.type == 'scroll' && event.target == document) {
-        CurrentNode();
-        
-        console.log("current node %s", navNodes.id.array[scroll.index]);
-        document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 20, 0, 0.5)';
 
         // Because of the scroll event firing rapidly due to events being asynchronous,
         // which results in the event being fired, even during a function call in the event,
@@ -249,6 +250,13 @@ function EventHandler(event) {
             console.log('error');
             requestAnimationFrame(ScrollToNextNode);
         }
+
+        // The click block already handles the node index
+        // and coloring.
+        if (!clickedNode && !scroll.ticking) {
+            CurrentNode();
+        }
+        console.log("current node %s", navNodes.id.array[scroll.index]);
     }
 
     else if (event.type == 'click') {
@@ -276,27 +284,28 @@ function EventHandler(event) {
                 if (event.target.id == navNodes.id.array[i]) {
                     scroll.prevScrollY = scroll.node.y[scroll.index];
                     displacement = i - scroll.index;
-                    if (displacement < 0) {
-                        // This makes sure the current index node changes its color,
-                        // as currentNode doesn't detect <=, sometimes.
-                        document.getElementById((navNodes.id.array[scroll.index])).style.background = 
-                            'rgba(255, 0, 100, 0.5)';
-                    }
-                    scroll.index += displacement;
                 }
             }
 
             console.log('displacement %s', displacement);
             if (displacement < 0) {
-                clickedNode = true;
-                console.log('going to scroll up');
-                requestAnimationFrame(Scrollup);
+
+                // Set current node to a light color
+                // and set destination node to dark color.
+                document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+                document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
+
+                    clickedNode = true;
+                    console.log('going to scroll up');
+                    Scrollup(displacement);
             }
 
             else if (displacement > 0) {
-                clickedNode = true;
-                console.log('going to scroll down');
-                requestAnimationFrame(Scrolldown);
+                document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
+                document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
+                    clickedNode = true;
+                    console.log('going to scroll down');
+                    Scrolldown(displacement);
             }
         }
         
