@@ -13,9 +13,6 @@ const options = document.querySelector('.options');
 const innerButton = document.querySelector('.inner-button');
 const outerButton = document.querySelector('.outer-button');
 
-// Could make this also accept an array and 
-// add event listeners to all of them
-
 Listen(nav, true);
 Listen(options);
 Listen(innerButton);

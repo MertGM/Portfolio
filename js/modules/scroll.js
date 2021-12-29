@@ -3,32 +3,46 @@
 // TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
 // TODO: Draw greetings on the landing page aka root
+//
+//
 
-import {preferences} from './animate.js'; 
-console.log('preferences %o', preferences)
+
+var preferences = {
+    // Local storage uses utf-16 characters
+    auto_scroll: 'true'
+};
+
+var scroll_state = {
+    disabled: 0,
+    enabled: 1,
+    scrolling: 2,
+};
+
+var scroll_trigger = {
+    none: 0,
+    scroll: 1,
+    click: 2,
+};
 
 // Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
 export var scroll = {
     prevScrollY: document.documentElement.scrollTop,
     currentScrollY: 0,
+    state: scroll_state.enabled,
+    trigger: scroll_trigger.none,
 
     // This is a "reference" (shallow copy) of the body's HTMLCollection.
     
     node: Array.from(document.body.children),
     index: 0,
-    ticking: false,
-    active: false,
-
 };
 
-
-// RequestAnimationFrame doesn't accept arguments, so for now
-// these variables are global.
+// Local storage should already be set by animate.js since that is loaded first, so we don't need to check for undefined or null.
+preferences.auto_scroll = localStorage.getItem('auto scroll');
 
 var t = 0;
 var sum = 0;
-var clickedNode = false;
 
 // Hash table to an id and index lookup of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
@@ -95,11 +109,8 @@ function Easein(p0,p1,p2) {
 
 function Scrolldown(dis=1) {
     function Loop() {
-        // if we call this function via a click event, then ticking is false
-        
-        if (!scroll.ticking || clickedNode) {
-            scroll.ticking = true;
-            clickedNode = false;
+        if (scroll.state == scroll_state.enabled) {
+            scroll.state = scroll_state.scrolling;
             sum = scroll.node.y[scroll.index+dis];
             scroll.currentScrollY = window.scrollY;
 
@@ -122,10 +133,10 @@ function Scrolldown(dis=1) {
         
         if (scroll.currentScrollY >= sum) {
             // End of scrolling
-            //CurrentNode();
             t = 0;
             scroll.prevScrollY = scroll.currentScrollY;
-            scroll.ticking = false;
+            scroll.state = scroll_state.enabled;
+            scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
             console.log('done scrolling');
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
@@ -150,9 +161,8 @@ function Scrolldown(dis=1) {
 
 function Scrollup(dis=-1) {
     function Loop() {
-        if (!scroll.ticking|| clickedNode) {
-            scroll.ticking = true;
-            clickedNode = false;
+        if (scroll.state == scroll_state.enabled) {
+            scroll.state = scroll_state.scrolling;
             sum = scroll.node.y[scroll.index+dis];
             scroll.currentScrollY = window.scrollY;
             scroll.prevScrollY = scroll.currentScrollY;
@@ -167,10 +177,10 @@ function Scrollup(dis=-1) {
 
         if (scroll.currentScrollY <= sum) {
             // End of scrolling
-            //CurrentNode();
             t = 0;
             scroll.prevScrollY = scroll.currentScrollY;
-            scroll.ticking = false;
+            scroll.state = scroll_state.enabled;
+            scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
             console.log('done scrolling');
             console.log('Sum %c%s  ', 'color: green;', sum);
@@ -212,7 +222,7 @@ function CurrentNode() {
             console.log('index %s', scroll.index);
 
             // Change index if page is scrolling without auto scroll
-            if (!scroll.ticking) {scroll.index++;}
+            if (preferences.auto_scroll == 'false') {scroll.index++;}
         }
 
         else if ((window.scrollY <= ((scroll.node.y[scroll.index]) - yOffset))) {
@@ -222,7 +232,7 @@ function CurrentNode() {
             console.log('changed color on scroll up');
             console.log('index %s', scroll.index);
 
-            if (!scroll.ticking) {scroll.index--;}
+            if (preferences.auto_scroll == 'false') {scroll.index--;}
 
         }
 }
@@ -236,24 +246,20 @@ function EventHandler(event) {
     console.log('event %o', event);
     console.log('event target %o', event.target);
     console.log('event target id %s', event.target.id);
+    console.log('event target class %s', event.target.className);
     console.log('nav outside handler: %s', navNodes.id[event.target.id]);
 
     if (event.type == 'scroll' && event.target == document) {
-
-        // Because of the scroll event firing rapidly due to events being asynchronous,
-        // which results in the event being fired, even during a function call in the event,
-        // we use ticking.
-        // ticking means it's busy scrolling the page, 
-        // we only start executing the function if we currently aren't scrolling scrolling.
+        // Only start executing the function if page isn't scrolling already.
         
-        if (!scroll.ticking && preferences["autoScroll"] == 'true') {
-            console.log('error');
+        if (scroll.state == scroll_state.enabled && preferences.auto_scroll == 'true') {
+            scroll.trigger = scroll_trigger.scroll;
             requestAnimationFrame(ScrollToNextNode);
         }
 
-        // The click block already handles the node index
+        // The click block already handles the scroll index
         // and coloring.
-        if (!clickedNode && !scroll.ticking) {
+        if (scroll.trigger != scroll_trigger.click) {
             CurrentNode();
         }
         console.log("current node %s", navNodes.id.array[scroll.index]);
@@ -262,20 +268,27 @@ function EventHandler(event) {
     else if (event.type == 'click') {
         console.log('found a click event!');
 
-        if (preferences['autoScroll'] == 'false') {
-            scroll.ticking = true;
-            console.log('turned off auto scroll')
+        // It might that the event handler doesn't get fired,
+        // this might be because animate.js also handles the click event for these elements.
+        // So nice...
+        if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer') {
+            preferences.auto_scroll = localStorage.getItem('auto scroll');
+            if (preferences.auto_scroll == 'true') {
+                scroll.state = scroll_state.enabled;
+
+                // Save the current window scroll y when activating auto scroll,
+                // so that when you scroll it will be able to compare prevscrollY with currentScrollY
+                scroll.prevScrollY = window.scrollY;
+                console.log('turned on auto scroll')
+            }
+            else {
+                scroll.state = scroll_state.disabled;
+                console.log('turned off auto scroll')
+            }
+
         }
 
-        else if (preferences['autoScroll'] == 'true') {
-            scroll.ticking = false;
-            // Save the current window scroll y when activating auto scroll enabled,
-            // so that when you scroll it will be able to compare prevscrollY with currentScrollY
-            scroll.prevScrollY = window.scrollY;
-            console.log('turned on auto scroll')
-        }
-
-        if (event.target.id == navNodes.id[event.target.id]) {
+        if (scroll.state != scroll_state.scrolling && event.target.id == navNodes.id[event.target.id]) {
 
             console.log('nav found in handler: %s', navNodes.id[event.target.id]);
             var displacement = 0;
@@ -289,38 +302,28 @@ function EventHandler(event) {
 
             console.log('displacement %s', displacement);
             if (displacement < 0) {
-
                 // Set current node to a light color
                 // and set destination node to dark color.
                 document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
                 document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
+                scroll.trigger = scroll_trigger.click;
 
-                    clickedNode = true;
-                    console.log('going to scroll up');
-                    Scrollup(displacement);
+                // This is needed to execute the block that get evaluated once in the scrolling functions.
+                // Note: this does not mean enabling auto scroll on scroll event.
+                scroll.state = scroll_state.enabled;
+                console.log('going to scroll up');
+
+                Scrollup(displacement);
             }
 
             else if (displacement > 0) {
                 document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
                 document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
-                    clickedNode = true;
-                    console.log('going to scroll down');
-                    Scrolldown(displacement);
-            }
-        }
-        
-        else if (event.target.className == 'theme') {
-            console.log('Event target %o', event.target);
-            const el = document.querySelector('.theme');
-            console.log('element %s', el);
-            if (el.id == 'dark') {
-                el.id = 'light';
-                console.log('switched to light theme', el.id)
-            }
+                scroll.trigger = scroll_trigger.click;
+                scroll.state = scroll_state.enabled;
+                console.log('going to scroll down');
 
-            else if (el.id == 'light') {
-                el.id = 'dark';
-                console.log('switched to dark theme %s', el.id)
+                Scrolldown(displacement);
             }
         }
     }

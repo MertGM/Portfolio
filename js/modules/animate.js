@@ -8,9 +8,6 @@ var body = document.querySelector('body');
 var optionsButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
 
-// User preferences on animation functions
-export var preferences = {};
-
 // We show the options menu at the start, because css messes up transormations.
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
@@ -270,25 +267,17 @@ export function PreloadAnimations() {
         sunAnimation.play();
     }
 
-    console.log('autoooooo %s', autoScroll);
     if (autoScroll == 'false')
     {
-        console.log('autoooooo %s', autoScroll);
         // We can't do this instantly afaik
         buttonAnimation.playbackRate = 20;
         buttonAnimation.play();
         buttonFillAnimation.playbackRate = 20;
         buttonFillAnimation.play();
     }
-
-    preferences["autoScroll"] = autoScroll;
 }
 
 function Start() {
-    /*console.log(buttonAnimation.currentTime);
-    console.log(buttonAnimation.playbackRate);
-    console.log(buttonAnimation.effect);*/
-    
     if (autoScroll == 'true') {
         console.log('Swipe left')
         buttonAnimation.playbackRate = 1;
@@ -307,5 +296,4 @@ function Start() {
     }
 
     localStorage.setItem('auto scroll', autoScroll);
-    preferences["autoScroll"] = autoScroll;
 }
