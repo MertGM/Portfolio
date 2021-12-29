@@ -1,9 +1,10 @@
 //
+// TODO: Fix scrolling issue when reloading the page.
+// Page sometimes scrolls back to the top from the last position on the page; which fires scroll event and causes auto scroll to behave incorrectly.
 //
 // TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
 // TODO: Draw greetings on the landing page aka root
-//
 //
 
 
@@ -24,15 +25,14 @@ var scroll_trigger = {
     click: 2,
 };
 
-// Objects are passed by "reference", thus the scroll object is able to change it's properties externally
 
-export var scroll = {
+var scroll = {
     prevScrollY: document.documentElement.scrollTop,
     currentScrollY: 0,
     state: scroll_state.enabled,
     trigger: scroll_trigger.none,
 
-    // This is a "reference" (shallow copy) of the body's HTMLCollection.
+    // Stored as HTMLCollection
     
     node: Array.from(document.body.children),
     index: 0,
@@ -41,8 +41,6 @@ export var scroll = {
 // Local storage should already be set by animate.js since that is loaded first, so we don't need to check for undefined or null.
 preferences.auto_scroll = localStorage.getItem('auto scroll');
 
-var t = 0;
-var sum = 0;
 
 // Hash table to an id and index lookup of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
@@ -101,13 +99,15 @@ function ScrollToNextNode() {
 }
 
 // Quadratic bezier curve
-function Easein(p0,p1,p2) {
+function Easein(t, p0,p1,p2) {
     var p = (((1-t)**2 * p0) + (2*(1-t)*t*p1) + (t**2*p2))
     document.documentElement.scroll(0, p);
     return p;
 }
 
 function Scrolldown(dis=1) {
+    var t = 0;
+    var sum = 0;
     function Loop() {
         if (scroll.state == scroll_state.enabled) {
             scroll.state = scroll_state.scrolling;
@@ -144,7 +144,7 @@ function Scrolldown(dis=1) {
             return;
         }
 
-        scroll.currentScrollY = Easein(scroll.prevScrollY, sum - 100, sum);
+        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum - 100, sum);
         t+= 0.02;
 
 
@@ -160,6 +160,8 @@ function Scrolldown(dis=1) {
 
 
 function Scrollup(dis=-1) {
+    var t = 0;
+    var sum = 0;
     function Loop() {
         if (scroll.state == scroll_state.enabled) {
             scroll.state = scroll_state.scrolling;
@@ -189,7 +191,7 @@ function Scrollup(dis=-1) {
 
         }
 
-        scroll.currentScrollY = Easein(scroll.prevScrollY, sum + 100, sum);
+        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum + 100, sum);
         t+= 0.02;
 
 
@@ -212,7 +214,7 @@ function Sum(htmlCollection, stop) {
 
 
 function CurrentNode() {
-        var yOffset = 50;
+        var yOffset = 60;
         if (window.scrollY >= ((scroll.node.y[scroll.index+1]) - yOffset)) {
 
             // Reset the background color to it's 'non active' color
@@ -336,11 +338,9 @@ export function AutoScroll() {
 
 
 // Add an event listener to the given argument which triggers the EventHandler
-// Argument: must be a parent of child elements with the child's id corresponding to
-// the container classes of the document.
 
-// Id's and indecies get put in a hash table (object) for instant lookup.
-// A navigator is a parent element that has a bubbling phase ... 
+// Argument 1: Id's and indecies get put in a hash table (object) for quick and easy access.
+// Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events on its children.
 
 export function Listen(el, nav=false) {
     //  we create a lookup table (hash table) aka object,
@@ -368,7 +368,7 @@ export function Listen(el, nav=false) {
                     if (nav[m] == classname[k]) {
                         //console.log('found matching id %s', classname[k]);
 
-                        // Sum the height of the elements up to the node aka parent node
+                        // Sum the height of the elements
                         node.push(Sum(scroll.node, j-1));
                         m++;
                     }

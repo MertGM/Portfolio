@@ -240,94 +240,118 @@ aside ul {
 }
 
 @media screen and (max-width: 600px) {
+    /* TODO: outline doesn't work for keyboard users, but mobile has them
+     * I want the mobile to not have outline and keyboard do.
+       */
 
-  .options-menu {
-      width: 100%;
-  }
-  .container-spaced {
-    border-width: 0.5em;
+    .options-menu {
+        width: 65%;
+    }
+    .options ul {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+    .container-spaced {
+    border-width: 0.4em;
     border-radius: 3em;
-  }
-  
-  aside {
-      left: 80%;
-  }
+    }
 
-  #links {
-  }
 
-  /* Font sizes for mobile need to be checked when website is done */
+    aside {
+      left: 65%;
+    }
+
+    h1 {
+        font-size: 1.1em;
+    }
+    p {
+        font-size: 0.7em;
+    }
+    li {
+      font-size: 0.65em;
+    }
+    .nav li:hover {
+        font-size: 0.7em;
+    }
+
+
+    /* Font sizes for mobile need to be checked when website is done */
 }
 
 @media screen and (min-width: 600px) {
-  .options-menu {
+    .options-menu {
       width: 50%;
-  }
-  aside {
+    }
+    aside {
       left: 80%;
-  }
-  #links {
+    }
+    #links {
       width: 100%;
-  }
+    }
 }
 
 @media screen and (min-width: 900px) {
-  .options-menu {
-      width: 40%;
-  }
-  .container-spaced {
+    .options-menu {
+      width: 35%;
+    }
+    .container-spaced {
     border-width: 1em;
     border-radius: 5em;
     height: auto;
-  }
+    }
 
-  p {
+    p {
     font-size: 1em;
-  }
+    }
 
-  li {
+    li {
     font-size: 1em;
-  }
+    }
 
-  h1 {
+    h1 {
     font-size: 1.5em;
-  }
-  aside {
+    }
+    aside {
       left: 85%;
-  }
+    }
 }
 
 @media screen and (min-width: 1400px) {
-  .options-menu {
-      width: 30%;
-  }
+    .options-menu {
+      width: 20%;
+    }
+    .options ul {
+        padding-left: 1.5em;
+        padding-right: 1em;
+    }
 
-  .container-spaced {
+    .container-spaced {
       height: 60%;
-  }
-  p {
+    }
+
+    p {
     font-size: 1em;
-  }
-  li {
+    }
+    li {
     font-size: 1em;
-  }
-  h1 {
+    }
+    h1 {
     font-size: 2em;
-  }
-  aside {
+    }
+    aside {
       left: 90%;
-  }
-  #links {
+    }
+    #links {
       width: 70%;
-  }
+    }
 }
 
 @media screen and (min-width: 1900px) {
-  p,
-  li {
-    font-size: 2em;
-  }
-  h1 {
-    font-size: 3em;
-  }
+    p,
+    li {
+    font-size: 1.2em;
+    }
+    h1 {
+    font-size: 2.5em;
+    }
 }

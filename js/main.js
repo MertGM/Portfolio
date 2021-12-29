@@ -3,7 +3,7 @@ import {Animate, PreloadAnimations} from './modules/animate.js';
 document.addEventListener('DOMContentLoaded', PreloadAnimations, false);
 Animate();
 
-import {AutoScroll, scroll, Listen} from './modules/scroll.js';
+import {AutoScroll, Listen} from './modules/scroll.js';
 
 
 AutoScroll();

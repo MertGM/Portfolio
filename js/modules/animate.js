@@ -66,6 +66,7 @@ console.log(optionsCollapsed);
 if (autoScroll == null) {
     // Auto scroll is enabled by default
     autoScroll = 'true';
+    localStorage.setItem('auto scroll', autoScroll);
 }
 
 var buttonScroll = document.querySelector('.inner-button');
