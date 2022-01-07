@@ -6,17 +6,18 @@ Animate();
 import {AutoScroll, Listen} from './modules/scroll.js';
 
 
-AutoScroll();
-
 const nav = document.querySelector('.nav');
 const options = document.querySelector('.options');
 const innerButton = document.querySelector('.inner-button');
 const outerButton = document.querySelector('.outer-button');
 
+Listen(null)
 Listen(nav, true);
 Listen(options);
 Listen(innerButton);
 Listen(outerButton);
+
+AutoScroll();
 
 
 

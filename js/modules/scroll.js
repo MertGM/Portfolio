@@ -4,7 +4,7 @@
 //
 // TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
 //
-// TODO: Draw greetings on the landing page aka root
+// TODO: Draw greetings on the landing page
 //
 
 
@@ -42,22 +42,16 @@ var scroll = {
 preferences.auto_scroll = localStorage.getItem('auto scroll');
 
 
-// Hash table to an id and index lookup of the 'navigation' elements.
+// Object has an id object and index array of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
-// Elements must be identical to the structure, and id name 
-// of the containers to be able to scroll to.
-
-// Might make individual object in this object for each element.
-// Since the syntax gets cumbersome.
+// Elements structure must be identical to the DOM, and ids 
+// must be the same as the containers class.
 
 var navNodes = {
     id: {},
 }
 
-// We need a base height of 0 to be able to scroll from the root
-// to the subsequent container
 
-scroll.node.unshift({clientHeight: 0});
 console.log(scroll.node);
 
 // Check what the index is on page load, so that when you refresh at a certain position,
@@ -65,12 +59,16 @@ console.log(scroll.node);
 
 function SetCurrentIndex() {
     console.log('prevscrolly %s', scroll.prevScrollY);
-    for (var i = 0; i < scroll.node.y.length; i++) {
-        console.log(scroll.node.y[i]);
-        if (scroll.node.y[i] >= scroll.prevScrollY) {
-            console.log('index: %s', i)
-            scroll.index = i;
-            return;
+    if (scroll.node.y != undefined) {
+        for (var i = 0; i < scroll.node.y.length; i++) {
+            console.log(scroll.node.y[i]);
+            if (scroll.node.y[i] >= scroll.prevScrollY) {
+
+        // Bug: if a container is not associated with the nav, then it will throw an error and coloring will not be correct
+                document.getElementById((navNodes.id.array[i])).style.background = 'rgba(255, 20, 0, 0.5)';
+                console.log('index: %s', i)
+                return;
+            }
         }
     }
 }
@@ -204,9 +202,9 @@ function Scrollup(dis=-1) {
     requestAnimationFrame(Loop);
 }
 
-function Sum(htmlCollection, stop) {
+function Sum(htmlCollection, start, stop) {
     var x = 0;
-    for (var i = 0; i < stop; i++) {
+    for (var i = start; i < stop; i++) {
         x += htmlCollection[i].clientHeight;
     }
     return x;
@@ -214,6 +212,7 @@ function Sum(htmlCollection, stop) {
 
 
 function CurrentNode() {
+        // Bug: if a container is not associated with the nav, then it will throw an error and coloring will not be correct
         var yOffset = 60;
         if (window.scrollY >= ((scroll.node.y[scroll.index+1]) - yOffset)) {
 
@@ -305,7 +304,9 @@ function EventHandler(event) {
             console.log('displacement %s', displacement);
             if (displacement < 0) {
                 // Set current node to a light color
-                // and set destination node to dark color.
+                // and set destination node to a dark color.
+                // Bug: if a container is not associated with the nav, then it will throw an error 
+                // and coloring will not be correct
                 document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
                 document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
                 scroll.trigger = scroll_trigger.click;
@@ -333,43 +334,39 @@ function EventHandler(event) {
 
 // This function will enable auto scrolling for the given page.
 export function AutoScroll() {
-    window.addEventListener('scroll', EventHandler, false);
+    setTimeout(function() {
+        CurrentNode();
+        window.addEventListener('scroll', EventHandler, false);
+    }, 100);
 }
 
 
-// Add an event listener to the given argument which triggers the EventHandler
+// Add an event listener to the given argument which the event handler handles.
 
-// Argument 1: Id's and indecies get put in a hash table (object) for quick and easy access.
-// Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events on its children.
+// Argument 1: Element's even to be listened for, if null then for each container (container100 in this case)
+// the height distance from the top of the page will be assigned as scroll.node.y
+// Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events for its children.
 
 export function Listen(el, nav=false) {
-    //  we create a lookup table (hash table) aka object,
-    //  if we don't already have one.
-    //  This is so we have instant access to the index (page) of an element (container)
-    
-    if ((Object.keys(navNodes.id).length == 0) && nav == true) {
-        for (var i = 0; i < el.children.length; i++) {
-            navNodes.id[(el.children[i].id)] = el.children[i].id;
-        }
-
-        var nav = Object.keys(navNodes.id);
-        console.log("navs %o", navNodes.id);
-
-        
+    if (el == null) {
         var node = [];
         var m = 0;
-        console.log('node id %o', scroll.node[3]);
+        var start = -1
+        console.log('scroll nodes %o', scroll.node);
         for (var j = 0; j < scroll.node.length; j++) {
             var classname = scroll.node[j].classList;
             if (classname != undefined) {
                 for (var k = 0; k < classname.length; k++) {
                     //console.log(classname[k]);
-                    //console.log(nav[j]);
-                    if (nav[m] == classname[k]) {
+                    //console.log(id[m]);
+                    if (classname[k] == 'container100') {
                         //console.log('found matching id %s', classname[k]);
-
-                        // Sum the height of the elements
-                        node.push(Sum(scroll.node, j-1));
+                        
+                        if (start == -1) {
+                            start = j;
+                        }
+                        
+                        node.push(Sum(scroll.node, start, j));
                         m++;
                     }
                 }
@@ -378,9 +375,19 @@ export function Listen(el, nav=false) {
 
         scroll.node.y = node;
         console.log("%o", scroll.node.y);
-        navNodes.id.array = Object.keys(navNodes.id);
     }
 
-    console.log('Added event listener on %o', el);
-    el.addEventListener('click', EventHandler, false);
+    else if (nav == true) {
+        for (var i = 0; i < el.children.length; i++) {
+            navNodes.id[(el.children[i].id)] = el.children[i].id;
+        }
+
+        navNodes.id.array = Object.keys(navNodes.id);
+        el.addEventListener('click', EventHandler, false);
+        console.log('Added event listener on %o', el);
+    }
+    else {
+        el.addEventListener('click', EventHandler, false);
+        console.log('Added event listener on %o', el);
+    }
 }

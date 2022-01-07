@@ -9,18 +9,21 @@
     <link rel="stylesheet" href="styles/style.css" />
   </head>
   <body>
-    <div class="spinner" id="visible">
+    <div class="spinner-background" id="visible">
+        <svg>
+            <circle id="spinner" cx="50%" cy="30%" r="3%"/>
+        </svg>
     </div>
-    <div class="container100 home">
       <svg id="close-button-wrapper" viewbox="0 0 50 80">
           <circle id="outer-circle" cy="23%" cx="20%" r="14" stroke-width="5px" fill="none" />
           <circle id="inner-circle" cy="23%" cx="20%" r="7" stroke-width="0px" />
       </svg>
+    <div class="container100 home">
     <options-menu class="options-menu">
       <div class="options-menu-wrapper">
           <div class="options">
               <ul>
-                <li class="auto-scroll-text" id="off">Smooth Scroll</li>
+                <li class="auto-scroll-text" id="off">Auto Scroll</li>
                 <li class="theme">Theme</li>
 
                 <li class="theme">...</li>

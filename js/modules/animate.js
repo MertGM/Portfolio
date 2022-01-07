@@ -8,7 +8,7 @@ var body = document.querySelector('body');
 var optionsButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
 
-// We show the options menu at the start, because css messes up transormations.
+// We show the options menu at the start, because css messes up transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
 
@@ -42,15 +42,17 @@ var optionIconsAnimation = optionIcons.animate([
 optionIconsAnimation.pause();
 
 
-var spinnerBackground = document.querySelector('.spinner');
-var spinnerBackgroundAnimation = spinnerBackground.animate([
-    { opacity: 0 }
+var spinnerBackground = document.querySelector('.spinner-background');
+var spinner = document.getElementById('spinner');
+var spinnerAnimation = spinner.animate([
+    { transform: 'rotate(360deg)' },
     ],  {
       fill: 'forwards',
       easing: 'ease-in',
-      duration: 1000
+      duration: 2000,
+      iterations: Infinity,
     });
-spinnerBackgroundAnimation.pause();
+spinnerAnimation.pause();
 
 
 
@@ -99,6 +101,8 @@ var optionsOuterButtonAnimation;
 // Initialize variables when css is done parsing
 
 function InitButtonAnimation() {
+    spinnerBackground.id = 'hidden';
+
     optionsButton = document.getElementById('inner-circle');
     optionsOuterButton = document.getElementById('outer-circle');
     optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
@@ -111,8 +115,6 @@ function InitButtonAnimation() {
             color2 = '#aef'
     }
 
-
-    // Todo: Reinitializing might not be optimal, have to benchmark this.
     optionsButtonAnimation = optionsButton.animate([
             { fill: optionsFill},
             { fill: color1},
@@ -185,11 +187,8 @@ function ThemeSwitch() {
 
 export function Options(e) {
     // Change play back rate according to its 'state' (true or false) and store it in the local storage.
-    // This is so we can load the animations beforehand according how the user last left them there;
-    // in this case is the menu collapsed or not?
-    // This allows us to replicate caching an animation state
+    // This is so we can load the animations beforehand according how the user last left them there.
     
-    // local storage stores utf-16 strings
     console.log(e.currentTarget);
 
     if (optionsCollapsed == 'true') {
@@ -220,6 +219,8 @@ export function Options(e) {
     else {
         optionsButtonAnimation.play();
     }
+
+    // local storage uses utf-16 strings
     localStorage.setItem('options', optionsCollapsed);
 }
 
@@ -233,29 +234,17 @@ export function Animate() {
 }
 
 export function PreloadAnimations() {
-    // Play the animations according to its collapsed 'state'
-     
-    // Make the animation run faster so our loading screen will take the minimum time,
-    // and also prevent from showing the animation after the loading is done.
+    // Animate animations to its last state according to local storage values
     // Only animate collapse since the default is the menu being open 
-    
+    spinnerAnimation.play();
+
     if (optionsCollapsed == 'true') {
         optionsMenuAnimation.playbackRate = 20;
         optionsAnimation.playbackRate = 20;
 
-        spinnerBackgroundAnimation.play();
+        spinnerAnimation.play();
         optionsAnimation.play();
         optionsMenuAnimation.play();
-
-        spinnerBackgroundAnimation.finished.then(function() {
-            spinnerBackground.id = 'hidden';
-        });
-    }
-    else {
-        spinnerBackgroundAnimation.play();
-        spinnerBackgroundAnimation.finished.then(function() {
-            spinnerBackground.id = 'hidden';
-        });
     }
 
     if (theme == 'sun') {
