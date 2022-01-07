@@ -120,7 +120,7 @@ function Scrolldown(dis=1) {
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
 
-        console.log('index %s', scroll.index);
+        console.log('prev index %s', scroll.index);
         console.log('Sum %c%s  ', 'color: blue;', sum);
         console.log('dis %c%s  ', 'color: red;', dis);
 
@@ -137,12 +137,13 @@ function Scrolldown(dis=1) {
             scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
             console.log('done scrolling');
+            console.log('current index %s', scroll.index);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
             console.log('prev scroll y %c%s  ', 'color: red;', scroll.prevScrollY);
             return;
         }
 
-        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum - 100, sum);
+        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum);
         t+= 0.02;
 
 
@@ -171,7 +172,7 @@ function Scrollup(dis=-1) {
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
 
-        console.log('index %s', scroll.index);
+        console.log('prev index %s', scroll.index);
         console.log('Sum %c%s  ', 'color: blue;', sum);
 
 
@@ -183,13 +184,15 @@ function Scrollup(dis=-1) {
             scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
             console.log('done scrolling');
+            console.log('current index %s', scroll.index);
             console.log('Sum %c%s  ', 'color: green;', sum);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
             return;
 
         }
 
-        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum + 100, sum);
+        // Javascript can't do proper floating point arithmetic, so we need to force it go less than 0
+        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum -2);
         t+= 0.02;
 
 
