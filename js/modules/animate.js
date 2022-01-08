@@ -165,9 +165,10 @@ sunAnimation.pause();
 
 var navColor = getComputedStyle(nav).getPropertyValue('--li-hover');
 var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
-var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
 var navAnims = [];
 var navCollapsed = true;
+var navLeftOffset = 0;
+var aside = document.querySelector('aside');
 for (var i = 0; i < nav.children.length; i++) {
     navAnims.push(nav.children[i].animate([
         { width: '0.1em'},
@@ -180,6 +181,53 @@ for (var i = 0; i < nav.children.length; i++) {
           duration: 500
         }));
     navAnims[i].pause();
+}
+
+// Resize the nav if x + width gets bigger than screen width
+
+function Resize(maxY, y) {
+    console.log('resize');
+    console.log('maxY %o', maxY);
+    console.log('y %o', y);
+    if (y > maxY) {
+        var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
+        var newLeft = prevLeft;
+        console.log('prevLeft %s', prevLeft);
+        function Loop() {
+            if (y > maxY) {
+                console.log('loop');
+                aside.style.left = ((--newLeft) + 'px');
+                y = nav.getBoundingClientRect().right;
+                console.log('resize y: %s', y);
+                navLeftOffset = prevLeft - newLeft;
+                console.log('nav left offset %s', navLeftOffset);
+                requestAnimationFrame(Loop);
+            }
+        }
+
+        requestAnimationFrame(Loop);
+    }
+
+    else if (navLeftOffset > 0) {
+        var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
+        var newLeft = prevLeft;
+        function Loop() {
+            if (navLeftOffset > 0) {
+                console.log('loop');
+                aside.style.left = ((++newLeft) + 'px');
+                navLeftOffset--;
+                console.log('shrink y offset: %s', navLeftOffset);
+                requestAnimationFrame(Loop);
+            }
+            else if (navLeftOffset == 0) {
+                // Remove applied inline css, so that external css can do the alignment again
+                console.log('remove attr');
+                aside.removeAttribute('style');
+            }
+        }
+
+        requestAnimationFrame(Loop);
+    }
 }
 
 
@@ -274,8 +322,17 @@ function NavAnimation(e) {
         if (e.type == 'mouseover' && navCollapsed) {
             for (var i = 0; i < navAnims.length; i++) {
                 navAnims[i].playbackRate = 1;
-                navAnims[i].play();
+                navAnims[i].play()
             }
+
+            // Passing a function call by name does not work as expected,
+            // only lambda's work for some reason.
+            
+            navAnims[navAnims.length -1].finished.then(function() {
+                console.log('done animating nav, proceeding to resize...');
+                Resize(document.body.clientWidth, nav.getBoundingClientRect().right);
+            });
+
             console.log('nav open');
             navCollapsed = false;
         }
@@ -285,6 +342,10 @@ function NavAnimation(e) {
                 navAnims[i].playbackRate = -1;
                 navAnims[i].play();
             }
+            navAnims[navAnims.length -1].finished.then(function() {
+                console.log('done animating nav, proceeding to resize...');
+                Resize(0, 0);
+            });
             console.log('nav collapse');
             navCollapsed = true;
         }

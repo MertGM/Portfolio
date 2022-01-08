@@ -244,18 +244,19 @@ aside ul {
     .options-menu {
         width: 65%;
     }
+
     .options ul {
         padding-left: 1em;
         padding-right: 1em;
     }
+    
     .container-spaced {
     border-width: 0.4em;
     border-radius: 3em;
     }
 
-
     aside {
-      left: 65%;
+      left: 80%;
     }
 
     h1 {
@@ -274,7 +275,7 @@ aside ul {
       width: 50%;
     }
     aside {
-      left: 80%;
+      left: 85%;
     }
     #links {
       width: 100%;
@@ -303,7 +304,7 @@ aside ul {
     font-size: 1.5em;
     }
     aside {
-      left: 85%;
+      left: 90%;
     }
 }
 
@@ -330,7 +331,7 @@ aside ul {
     font-size: 2em;
     }
     aside {
-      left: 90%;
+      left: 93%;
     }
     #links {
       width: 70%;
