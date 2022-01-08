@@ -228,17 +228,12 @@ aside ul {
 
 .nav li {
   list-style-type: none;
-  color: var(--font-primary);
+  color: rgba(255, 0, 100, 0);
   cursor: pointer;
   padding: 0.2em 1em 0.4em 1.5em;
   margin-bottom: 1em;
   border-radius: 1em;
   background-color: rgba(255, 0, 100, 0.5);
-}
-
-.nav li:hover {
-    color: var(--li-hover);
-    font-size: 1.1em;
 }
 
 @media screen and (max-width: 600px) {
@@ -271,9 +266,6 @@ aside ul {
     }
     li {
       font-size: 0.65em;
-    }
-    .nav li:hover {
-        font-size: 0.7em;
     }
 }
 

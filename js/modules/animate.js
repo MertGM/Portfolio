@@ -7,6 +7,7 @@ var sun = document.querySelector('.sun');
 var body = document.querySelector('body');
 var optionsButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
+var nav = document.querySelector('.nav'); 
 
 // We show the options menu at the start, because css messes up transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
@@ -136,7 +137,6 @@ function InitButtonAnimation() {
     optionsOuterButtonAnimation.pause();
     console.log(optionsFill);
 }
-
 window.addEventListener('load', InitButtonAnimation, false);
 
 
@@ -153,7 +153,6 @@ var moonAnimation = moon.animate([
     });
 moonAnimation.pause();
 
-
 var sunAnimation = sun.animate([
     { transform: 'scale(0,0)'}
     ], {
@@ -162,6 +161,26 @@ var sunAnimation = sun.animate([
       duration: 500
     });
 sunAnimation.pause();
+
+
+var navColor = getComputedStyle(nav).getPropertyValue('--li-hover');
+var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
+var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
+var navAnims = [];
+var navCollapsed = true;
+for (var i = 0; i < nav.children.length; i++) {
+    navAnims.push(nav.children[i].animate([
+        { width: '0.1em'},
+        { color: 'rgba(255, 0, 100, 0)'},
+        { width: '3em'},
+        { color: fontPrimary}
+        ], {
+          fill: 'both',
+          easing: 'ease-in-out',
+          duration: 500
+        }));
+    navAnims[i].pause();
+}
 
 
 function ThemeSwitch() {
@@ -184,6 +203,7 @@ function ThemeSwitch() {
     InitButtonAnimation();
     localStorage.setItem('theme', theme);
 }
+
 
 export function Options(e) {
     // Change play back rate according to its 'state' (true or false) and store it in the local storage.
@@ -224,13 +244,63 @@ export function Options(e) {
     localStorage.setItem('options', optionsCollapsed);
 }
 
+
+function SetAutoScroll() {
+    if (autoScroll == 'true') {
+        console.log('Swipe left')
+        buttonAnimation.playbackRate = 1;
+        buttonAnimation.play()
+        buttonFillAnimation.playbackRate = 1;
+        buttonFillAnimation.play();
+        autoScroll = 'false';
+    }
+    else {
+        console.log('Swipe right')
+        buttonAnimation.playbackRate = -1;
+        buttonAnimation.play();
+        buttonFillAnimation.playbackRate = -1;
+        buttonFillAnimation.play();
+        autoScroll = 'true';
+    }
+
+    localStorage.setItem('auto scroll', autoScroll);
+}
+
+
+function NavAnimation(e) {
+    if (e.target.tagName == 'LI') {
+        console.log('target type %o', e.type);
+        console.log('navCollapsed %s', navCollapsed);
+        if (e.type == 'mouseover' && navCollapsed) {
+            for (var i = 0; i < navAnims.length; i++) {
+                navAnims[i].playbackRate = 1;
+                navAnims[i].play();
+            }
+            console.log('nav open');
+            navCollapsed = false;
+        }
+
+        else if (e.type == 'mouseout' && navCollapsed == false) {
+            for (var i = 0; i < navAnims.length; i++) {
+                navAnims[i].playbackRate = -1;
+                navAnims[i].play();
+            }
+            console.log('nav collapse');
+            navCollapsed = true;
+        }
+    }
+}
+
+
 export function Animate() {
-    buttonScroll.addEventListener('mousedown', Start, false);
-    buttonScrollOuter.addEventListener('mousedown', Start, false);
+    buttonScroll.addEventListener('mousedown', SetAutoScroll, false);
+    buttonScrollOuter.addEventListener('mousedown', SetAutoScroll, false);
     optionsButton.addEventListener('mousedown', Options, false);
     optionsOuterButton.addEventListener('mousedown', Options, false);
     moon.addEventListener('mousedown', ThemeSwitch, false);
     sun.addEventListener('mousedown', ThemeSwitch, false);
+    nav.addEventListener('mouseover', NavAnimation, false);
+    nav.addEventListener('mouseout', NavAnimation, false);
 }
 
 export function PreloadAnimations() {
@@ -265,25 +335,4 @@ export function PreloadAnimations() {
         buttonFillAnimation.playbackRate = 20;
         buttonFillAnimation.play();
     }
-}
-
-function Start() {
-    if (autoScroll == 'true') {
-        console.log('Swipe left')
-        buttonAnimation.playbackRate = 1;
-        buttonAnimation.play()
-        buttonFillAnimation.playbackRate = 1;
-        buttonFillAnimation.play();
-        autoScroll = 'false';
-    }
-    else {
-        console.log('Swipe right')
-        buttonAnimation.playbackRate = -1;
-        buttonAnimation.play();
-        buttonFillAnimation.playbackRate = -1;
-        buttonFillAnimation.play();
-        autoScroll = 'true';
-    }
-
-    localStorage.setItem('auto scroll', autoScroll);
 }

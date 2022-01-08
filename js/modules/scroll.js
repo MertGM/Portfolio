@@ -191,7 +191,7 @@ function Scrollup(dis=-1) {
 
         }
 
-        // Javascript can't do proper floating point arithmetic, so we need to force it go less than 0
+        // Javascript doesn't do floating precision without the math library, so we need to force it go less than 0
         scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum -2);
         t+= 0.02;
 
@@ -271,25 +271,25 @@ function EventHandler(event) {
 
     else if (event.type == 'click') {
         console.log('found a click event!');
-
-        // It might that the event handler doesn't get fired,
-        // this might be because animate.js also handles the click event for these elements.
-        // So nice...
         if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer') {
-            preferences.auto_scroll = localStorage.getItem('auto scroll');
-            if (preferences.auto_scroll == 'true') {
-                scroll.state = scroll_state.enabled;
+            var done = (function() {
+                preferences.auto_scroll = localStorage.getItem('auto scroll');
+                return true;
+            })();
+            if (done) {
+                if (preferences.auto_scroll == 'true') {
+                    scroll.state = scroll_state.enabled;
 
-                // Save the current window scroll y when activating auto scroll,
-                // so that when you scroll it will be able to compare prevscrollY with currentScrollY
-                scroll.prevScrollY = window.scrollY;
-                console.log('turned on auto scroll')
+                    // Save the current window scroll y when activating auto scroll,
+                    // so that when you scroll it will be able to compare prevscrollY with currentScrollY
+                    scroll.prevScrollY = window.scrollY;
+                    console.log('turned on auto scroll');
+                }
+                else {
+                    scroll.state = scroll_state.disabled;
+                    console.log('turned off auto scroll');
+                }
             }
-            else {
-                scroll.state = scroll_state.disabled;
-                console.log('turned off auto scroll')
-            }
-
         }
 
         if (scroll.state != scroll_state.scrolling && event.target.id == navNodes.id[event.target.id]) {
