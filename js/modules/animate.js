@@ -169,6 +169,9 @@ var navAnims = [];
 var navCollapsed = true;
 var navLeftOffset = 0;
 var aside = document.querySelector('aside');
+var navCurrentTarget;
+var resizing = false;
+
 for (var i = 0; i < nav.children.length; i++) {
     navAnims.push(nav.children[i].animate([
         { width: '0.1em'},
@@ -185,20 +188,20 @@ for (var i = 0; i < nav.children.length; i++) {
 
 // Resize the nav if x + width gets bigger than screen width
 
-function Resize(maxY, y) {
+function Resize(maxX, x) {
     console.log('resize');
-    console.log('maxY %o', maxY);
-    console.log('y %o', y);
-    if (y > maxY) {
+    console.log('maxX %o', maxX);
+    console.log('x %o', x);
+    if (x > maxX) {
         var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
         var newLeft = prevLeft;
         console.log('prevLeft %s', prevLeft);
         function Loop() {
-            if (y > maxY) {
+            if (x > maxX) {
                 console.log('loop');
                 aside.style.left = ((--newLeft) + 'px');
-                y = nav.getBoundingClientRect().right;
-                console.log('resize y: %s', y);
+                x = nav.getBoundingClientRect().right;
+                console.log('resize x: %s', x);
                 navLeftOffset = prevLeft - newLeft;
                 console.log('nav left offset %s', navLeftOffset);
                 requestAnimationFrame(Loop);
@@ -228,6 +231,8 @@ function Resize(maxY, y) {
 
         requestAnimationFrame(Loop);
     }
+
+    return true;
 }
 
 
@@ -319,35 +324,48 @@ function NavAnimation(e) {
     if (e.target.tagName == 'LI') {
         console.log('target type %o', e.type);
         console.log('navCollapsed %s', navCollapsed);
-        if (e.type == 'mouseover' && navCollapsed) {
-            for (var i = 0; i < navAnims.length; i++) {
-                navAnims[i].playbackRate = 1;
-                navAnims[i].play()
+        if (e.type == 'mouseover') {
+            navCurrentTarget = 'mouseover';
+            if (navCollapsed && resizing == false) {
+                for (var i = 0; i < navAnims.length; i++) {
+                    navAnims[i].playbackRate = 1;
+                    navAnims[i].play()
+                }
+
+                // Passing a function call by name does not work as expected,
+                // only lambda's work for some reason.
+                
+                navAnims[navAnims.length -1].finished.then(function() {
+                    console.log('done animating nav, proceeding to resize...');
+                    Resize(document.body.clientWidth, nav.getBoundingClientRect().right);
+                });
+
+                console.log('nav open');
+                navCollapsed = false;
             }
-
-            // Passing a function call by name does not work as expected,
-            // only lambda's work for some reason.
-            
-            navAnims[navAnims.length -1].finished.then(function() {
-                console.log('done animating nav, proceeding to resize...');
-                Resize(document.body.clientWidth, nav.getBoundingClientRect().right);
-            });
-
-            console.log('nav open');
-            navCollapsed = false;
         }
 
         else if (e.type == 'mouseout' && navCollapsed == false) {
-            for (var i = 0; i < navAnims.length; i++) {
-                navAnims[i].playbackRate = -1;
-                navAnims[i].play();
-            }
-            navAnims[navAnims.length -1].finished.then(function() {
-                console.log('done animating nav, proceeding to resize...');
-                Resize(0, 0);
-            });
-            console.log('nav collapse');
-            navCollapsed = true;
+            navCurrentTarget = 'mouseout';
+            setTimeout(function() {
+                console.log('nav current target', navCurrentTarget);
+                if (navCurrentTarget == 'mouseout') {
+                    resizing = true;
+
+                    for (var i = 0; i < navAnims.length; i++) {
+                        navAnims[i].playbackRate = -1;
+                        navAnims[i].play();
+                    }
+                    navAnims[navAnims.length -1].finished.then(function() {
+                        console.log('done animating nav, proceeding to resize...');
+                        if (Resize(0, 0)) {
+                            resizing = false;
+                        }
+                    });
+                    console.log('nav collapse');
+                    navCollapsed = true;
+                }
+            }, 1000);
         }
     }
 }
