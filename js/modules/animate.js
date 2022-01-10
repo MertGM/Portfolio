@@ -7,7 +7,11 @@ var sun = document.querySelector('.sun');
 var body = document.querySelector('body');
 var optionsButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
+var buttonScroll = document.querySelector('.inner-button');
+var buttonScrollOuter = document.querySelector('.outer-button');
 var nav = document.querySelector('.nav'); 
+var sunShadow = document.getElementById('sun-shadow');
+var moonShadow = document.getElementById('moon-shadow');
 
 // We show the options menu at the start, because css messes up transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
@@ -44,16 +48,16 @@ optionIconsAnimation.pause();
 
 
 var spinnerBackground = document.querySelector('.spinner-background');
-var spinner = document.getElementById('spinner');
-var spinnerAnimation = spinner.animate([
-    { transform: 'rotate(360deg)' },
+var colorBgPrimary = getComputedStyle(document.body).getPropertyValue('--bg-primary');
+var spinnerBackgroundAnimation = spinnerBackground.animate([
+    { opacity: '0' },
     ],  {
       fill: 'forwards',
-      easing: 'ease-in',
-      duration: 2000,
-      iterations: Infinity,
+      easing: 'steps(2, end)',
+      duration: 1000
     });
-spinnerAnimation.pause();
+spinnerBackgroundAnimation.pause();
+
 
 
 
@@ -72,8 +76,6 @@ if (autoScroll == null) {
     localStorage.setItem('auto scroll', autoScroll);
 }
 
-var buttonScroll = document.querySelector('.inner-button');
-var buttonScrollOuter = document.querySelector('.outer-button');
 var buttonAnimation = buttonScroll.animate([
     { transform: 'translateX(-14px)' }
     ], {
@@ -102,8 +104,8 @@ var optionsOuterButtonAnimation;
 // Initialize variables when css is done parsing
 
 function InitButtonAnimation() {
-    spinnerBackground.id = 'hidden';
 
+    console.log('switchh');
     optionsButton = document.getElementById('inner-circle');
     optionsOuterButton = document.getElementById('outer-circle');
     optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
@@ -137,7 +139,6 @@ function InitButtonAnimation() {
     optionsOuterButtonAnimation.pause();
     console.log(optionsFill);
 }
-window.addEventListener('load', InitButtonAnimation, false);
 
 
 var theme = localStorage.getItem('theme');
@@ -244,6 +245,8 @@ function ThemeSwitch() {
         sunAnimation.play();
         moonAnimation.play()
         body.setAttribute('class', '');
+        sunShadow.setAttribute('class', 'hidden');
+        moonShadow.setAttribute('class', 'visible');
     }
     else {
         theme = 'sun';
@@ -252,6 +255,8 @@ function ThemeSwitch() {
         moonAnimation.play();
         sunAnimation.play()
         body.setAttribute('class', 'light');
+        moonShadow.setAttribute('class', 'hidden');
+        sunShadow.setAttribute('class', 'visible');
     }
     InitButtonAnimation();
     localStorage.setItem('theme', theme);
@@ -372,6 +377,7 @@ function NavAnimation(e) {
 
 
 export function Animate() {
+    InitButtonAnimation();
     buttonScroll.addEventListener('mousedown', SetAutoScroll, false);
     buttonScrollOuter.addEventListener('mousedown', SetAutoScroll, false);
     optionsButton.addEventListener('mousedown', Options, false);
@@ -385,25 +391,39 @@ export function Animate() {
 export function PreloadAnimations() {
     // Animate animations to its last state according to local storage values
     // Only animate collapse since the default is the menu being open 
-    spinnerAnimation.play();
 
     if (optionsCollapsed == 'true') {
         optionsMenuAnimation.playbackRate = 20;
         optionsAnimation.playbackRate = 20;
 
-        spinnerAnimation.play();
         optionsAnimation.play();
         optionsMenuAnimation.play();
+        optionsMenuAnimation.finished.then(function() {
+            spinnerBackgroundAnimation.play();
+            spinnerBackgroundAnimation.finished.then(function () {
+                spinnerBackground.id = 'hidden';
+            });
+        });
+    }
+    else {
+        spinnerBackgroundAnimation.play();
+        spinnerBackgroundAnimation.finished.then(function () {
+            spinnerBackground.id = 'hidden';
+        });
     }
 
     if (theme == 'sun') {
         moonAnimation.playbackRate = 20;
         moonAnimation.play();
         body.setAttribute('class', 'light');
+        moonShadow.setAttribute('class', 'hidden');
+        sunShadow.setAttribute('class', 'visible');
     }
     else if (theme == 'moon') {
         sunAnimation.playbackRate = 20;
         sunAnimation.play();
+        sunShadow.setAttribute('class', 'hidden');
+        moonShadow.setAttribute('class', 'visible');
     }
 
     if (autoScroll == 'false')

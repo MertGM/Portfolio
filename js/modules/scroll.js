@@ -2,10 +2,6 @@
 // TODO: Fix scrolling issue when reloading the page.
 // Page sometimes scrolls back to the top from the last position on the page; which fires scroll event and causes auto scroll to behave incorrectly.
 //
-// TODO: Make an option for the scrolling speed: fast->slow (smooth), slow->fast (snappy)
-//
-// TODO: Draw greetings on the landing page
-//
 
 
 var preferences = {
@@ -31,9 +27,6 @@ var scroll = {
     currentScrollY: 0,
     state: scroll_state.enabled,
     trigger: scroll_trigger.none,
-
-    // Stored as HTMLCollection
-    
     node: Array.from(document.body.children),
     index: 0,
 };
@@ -63,17 +56,15 @@ function SetCurrentIndex() {
         for (var i = 0; i < scroll.node.y.length; i++) {
             console.log(scroll.node.y[i]);
             if (scroll.node.y[i] >= scroll.prevScrollY) {
-
-        // Bug: if a container is not associated with the nav, then it will throw an error and coloring will not be correct
                 document.getElementById((navNodes.id.array[i])).style.background = 'rgba(255, 20, 0, 0.5)';
                 console.log('index: %s', i)
+                scroll.index = i;
                 return;
             }
         }
     }
 }
 
-window.addEventListener('load', SetCurrentIndex, false);
 
 function ScrollToNextNode() {
     scroll.currentScrollY = document.documentElement.scrollTop;
@@ -83,9 +74,6 @@ function ScrollToNextNode() {
     console.log('currentScrollY ' + scroll.currentScrollY);
     console.log('scroll' + scroll.index);
     console.log('node obj %o', scroll.node);
-
-        // Bug: Scroll function sets current.ScrollY multiple times if scrolling happens too fast.
-        // Could be because of recursion?
     
         if (scroll.currentScrollY > scroll.prevScrollY) {
             Scrolldown();
@@ -163,6 +151,10 @@ function Scrollup(dis=-1) {
     var sum = 0;
     function Loop() {
         if (scroll.state == scroll_state.enabled) {
+            // When scrolling without Auto Scroll index will decrement by 1 if scrollY =  container[i] height - y offset.
+            // Scrolling will now overscroll because index decremented twice. 
+            // Thus incrementing the index will fix this.
+            if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
             scroll.state = scroll_state.scrolling;
             sum = scroll.node.y[scroll.index+dis];
             scroll.currentScrollY = window.scrollY;
@@ -213,9 +205,7 @@ function Sum(htmlCollection, start, stop) {
     return x;
 }
 
-
 function CurrentNode() {
-        // Bug: if a container is not associated with the nav, then it will throw an error and coloring will not be correct
         var yOffset = 60;
         if (window.scrollY >= ((scroll.node.y[scroll.index+1]) - yOffset)) {
 
@@ -241,19 +231,31 @@ function CurrentNode() {
         }
 }
 
-// Might make the EventHanlder reside in a different script file,
-// since it handles different events besides scroll
 
 function EventHandler(event) {
-    // event.target gets the previous fired event
-    // This is handy when Event listener has a bubbling phase
     console.log('event %o', event);
     console.log('event target %o', event.target);
     console.log('event target id %s', event.target.id);
     console.log('event target class %s', event.target.className);
     console.log('nav outside handler: %s', navNodes.id[event.target.id]);
+    console.log('node full scroll height: %s', scroll.node.y[scroll.node.y.length -1]);
 
-    if (event.type == 'scroll' && event.target == document) {
+    if (event.type == 'resize') {
+        var containers = document.querySelectorAll('.container100');
+        var fullPageHeight = 0;
+
+        // Exclude last container height since the scrollbar stops there.
+        for (var i = 0; i < containers.length -1; i++) {
+            fullPageHeight += containers[i].clientHeight;
+        }
+        console.log('full page height: %s', fullPageHeight);
+
+        if (fullPageHeight != scroll.node.y[scroll.node.y.length -1]) {
+            Resize();
+        }
+    }
+
+    else if (event.type == 'scroll' && event.target == document) {
         // Only start executing the function if page isn't scrolling already.
         
         if (scroll.state == scroll_state.enabled && preferences.auto_scroll == 'true') {
@@ -271,7 +273,12 @@ function EventHandler(event) {
 
     else if (event.type == 'click') {
         console.log('found a click event!');
-        if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer') {
+        // Sometimes the svg 'options-icons' will trigger, even though it has pointer-events set to none.
+        // However clicking the svg area that is not overlapped by the buttons will not be triggered;
+        // So we can check for clicks on the svg aswell.
+        
+        if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer' || 
+            event.target.id == 'options-icons') {
             var done = (function() {
                 preferences.auto_scroll = localStorage.getItem('auto scroll');
                 return true;
@@ -308,13 +315,11 @@ function EventHandler(event) {
             if (displacement < 0) {
                 // Set current node to a light color
                 // and set destination node to a dark color.
-                // Bug: if a container is not associated with the nav, then it will throw an error 
-                // and coloring will not be correct
                 document.getElementById((navNodes.id.array[scroll.index])).style.background = 'rgba(255, 0, 100, 0.5)';
                 document.getElementById((navNodes.id.array[scroll.index+displacement])).style.background = 'rgba(255, 20, 0, 0.5)';
                 scroll.trigger = scroll_trigger.click;
 
-                // This is needed to execute the block that get evaluated once in the scrolling functions.
+                // This is needed to execute the if statement block in the scrolling functions.
                 // Note: this does not mean enabling auto scroll on scroll event.
                 scroll.state = scroll_state.enabled;
                 console.log('going to scroll up');
@@ -335,18 +340,24 @@ function EventHandler(event) {
     }
 }
 
-// This function will enable auto scrolling for the given page.
+// Enable auto scrolling for the given page.
 export function AutoScroll() {
     setTimeout(function() {
+        SetCurrentIndex();
         CurrentNode();
         window.addEventListener('scroll', EventHandler, false);
+        window.addEventListener('resize', EventHandler, false);
     }, 100);
 }
 
+function Resize() {
+    Listen();
+}
 
-// Add an event listener to the given argument which the event handler handles.
 
-// Argument 1: Element's even to be listened for, if null then for each container (container100 in this case)
+// Add an event listener to the given element, for which the event handler handles.
+
+// Argument 1: Element's event to be listened for, if null then for each container (container100 in this case)
 // the height distance from the top of the page will be assigned as scroll.node.y
 // Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events for its children.
 

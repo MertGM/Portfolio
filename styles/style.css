@@ -25,9 +25,6 @@ body.light {
   --btn-secondary: #e2641b;
 }
 
-label {
-    color: green;
-}
 
 html,
 body {
@@ -39,27 +36,28 @@ body {
 }
 
 
-#hidden {
+.hidden {
     display: none;
 }
 
-#visible {
-    display:block;
+.visible {
+    display: block;
 }
+
 
 .spinner-background {
     display: block;
     position: fixed;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-primary);
+    background-color: #000;
     z-index: 2;
 }
 
 #spinner {
-    stroke: #fff;
-    fill: #05f;
-    transform-origin: center;
+    display: block;
+    margin: auto;
+    margin-top: 30%;
 }
 
 .spinner-background#hidden {
@@ -70,6 +68,14 @@ body {
     width: 100%;
 }
 
+
+#hidden {
+    display: none;
+}
+
+#visible {
+    display:block;
+}
 
 p {
   font-size: 1rem;
@@ -98,19 +104,23 @@ p {
     margin-top: 1em;
 }
 
+#options-icons {
+    pointer-events: none;
+    z-index: 2;
+}
 .inner-button {
     fill: var(--btn-slider);
     stroke: #aff;
-    pointer-events: fill;
     cursor: pointer;
+    pointer-events: visible;
 }
 
 .outer-button {
     fill: var(--btn-on);
-    pointer-events: fill;
     stroke-width: 1.5px;
     stroke: #0a5;
     cursor: pointer;
+    pointer-events: visible;
 }
 
 #outer-circle {
@@ -143,6 +153,7 @@ p {
 
 .options-menu-wrapper {
     display: flex;
+    position: relative;
     flex-flow: row wrap;
     width: 100%;
     height: 100%;
@@ -163,14 +174,44 @@ p {
 }
 
 .moon {
-    pointer-events: fill;
+    fill: #aaa;
     cursor: pointer;
+    pointer-events: fill;
 }
 
 .sun {
-    pointer-events: fill;
+    fill: rgba(255, 255, 255, 0.8);
     cursor: pointer;
+    pointer-events: fill;
 }
+
+#sun-shadow {
+    position: absolute;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    top: 16%;
+    width: 10px;
+    height: 10px;
+    border-radius: 2em;
+    background-color: rgba(255, 255, 100, 0.55);
+    box-shadow: 2px 2px 50px 30px rgba(255, 255, 120, 1);
+}
+
+
+#moon-shadow {
+    position: absolute;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    top: 16%;
+    width: 10px;
+    height: 10px;
+    border-radius: 2em;
+    background-color: rgba(160, 180, 200, 0.55);
+    box-shadow: 2px 2px 40px 20px rgba(160, 180, 200, 1);
+}
+
 
 .auto-scroll {
     pointer-events: stroke;
@@ -257,6 +298,14 @@ aside ul {
 
     aside {
       left: 80%;
+    }
+
+    #moon-shadow {
+        left: 47%;
+    }
+
+    #sun-shadow {
+        left: 47%;
     }
 
     h1 {
