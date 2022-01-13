@@ -110,8 +110,8 @@ function InitButtonAnimation() {
     optionsOuterButton = document.getElementById('outer-circle');
     optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
     if ((document.querySelector('body').className) == 'light') {
-            color1 = '#a88';
-            color2 = '#f96';
+            color1 = '#f91';
+            color2 = '#fb1';
     }
     else {
             color1 = '#9af';

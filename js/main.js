@@ -19,3 +19,6 @@ Listen(innerButton);
 Listen(outerButton);
 
 AutoScroll();
+
+import {TwinkleStars} from './modules/canvas.js';
+TwinkleStars(100);
