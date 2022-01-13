@@ -50,7 +50,10 @@ function AnimateParticle(particle) {
             brighten = false;
         }
 
-        else {
+        // Don't run the animation if the page is in the background,
+        // this will cause the animation to run very fast when alt tabbing back.
+        
+        else if (document.visibilityState == 'visible') {
             requestAnimationFrame(Loop);
         }
 
