@@ -1,6 +1,5 @@
 import {Animate, PreloadAnimations} from './modules/animate.js';
 
-//document.addEventListener('DOMContentLoaded', PreloadAnimations, false);
 PreloadAnimations();
 Animate();
 
@@ -21,4 +20,12 @@ Listen(outerButton);
 AutoScroll();
 
 import {TwinkleStars} from './modules/canvas.js';
-TwinkleStars(100);
+if (document.body.clientWidth <= 500) {
+    TwinkleStars(100);
+}
+else if (document.body.clientWidth <= 1200) {
+    TwinkleStars(200);
+}
+else if (document.body.clientWidth >= 1200) {
+    TwinkleStars(300);
+}
