@@ -45,6 +45,21 @@ body {
 }
 
 
+#canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%
+}
+
+#canvas.invisible {
+    visibility: hidden;
+}
+
+#canvas.visible {
+    visibility: visible;
+}
+
+
 .spinner-background {
     display: block;
     position: fixed;
@@ -225,6 +240,8 @@ p {
   justify-content: center;
   color: var(--font-secondary);
 }
+
+
 .container100 {
   display: flex;
   height: 100%;
@@ -234,6 +251,7 @@ p {
   align-items: center;
   justify-content: center;
 }
+
 .container100 h1 {
     color: var(--font-header-primary);
 }
@@ -241,6 +259,7 @@ p {
 .container100 p {
     color: var(--font-p-primary);
 }
+
 
 .container-spaced {
   display: flex;
@@ -253,6 +272,7 @@ p {
   border-radius: 5rem;
   border-style: solid;
 }
+
 
 aside {
   display: block;
@@ -277,6 +297,42 @@ aside ul {
   margin-bottom: 1em;
   border-radius: 1em;
   background-color: rgba(255, 0, 100, 0.5);
+}
+
+
+.contact-wrapper {
+    min-width: 300px;
+    min-height: 500px;
+    width: 50%;
+    height: 80%;
+    background-color: var(--bg-modal-primary);
+    border-radius: 5em;
+}
+
+.contact-form {
+    width: 80%;
+    height: 80%;
+    margin-top: 2em;
+    margin-left: 2em;
+}
+
+.contact-form-headings {
+    margin-bottom: 3em;
+}
+
+.contact-form-message {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-form-message > label {
+    align-self: center;
+    padding-bottom: 1em;
+}
+
+
+#github-svg {
+    margin-right: auto;
 }
 
 @media screen and (max-width: 600px) {
@@ -319,21 +375,14 @@ aside ul {
     li {
       font-size: 0.65em;
     }
+
+    .contact-form-headings {
+        display: flex;
+        flex-direction: column;
+    }
+
 }
 
-#canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%
-}
-
-#canvas.invisible {
-    visibility: hidden;
-}
-
-#canvas.visible {
-    visibility: visible;
-}
 
 @media screen and (min-width: 600px) {
     .options-menu {
@@ -344,6 +393,13 @@ aside ul {
     }
     #links {
       width: 100%;
+    }
+
+    .contact-form-headings {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        row-gap: 1em;
+        grid-auto-columns: minmax(300px, auto);
     }
 }
 

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio</title>
     <link rel="stylesheet" href="styles/style.css" />
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="src/js/main.js"></script>
+    <script src="src/mailer/client.js"></script>
   </head>
   <body>
     <div class="spinner-background">
@@ -49,7 +50,7 @@
       </ul>
     </aside>
     <div class="container100 home">
-    <canvas id="canvas">
+    <canvas id="canvas" width="300" height="300">
     </canvas>
     </div>
     <div class="container100 about">
@@ -67,6 +68,22 @@
     </div>
     <div class="container100 contact">
       <h1>Contact</h1>
+      <div class="contact-wrapper">
+        <form class="contact-form">
+          <div class="contact-form-headings">
+            <label style="color:red">Name</label>
+            <input name="Name" id="form-name" required />
+            <label style="color:red">Email</label>
+            <input name="Email" type="email" id="form-email" required />
+            <label style="color:red">Subject</label>
+            <input name="Subject" id="form-Subject" required />
+          </div>
+          <div class="contact-form-message">
+            <label style="color:red">Message</label>
+            <textarea rows="9" id="form-message" required></textarea>
+          </div>
+        </form>
+      </div>
       <img id="github-svg" src="images/github.svg" alt="github logo">
     </div>
   </body>
