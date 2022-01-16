@@ -7,7 +7,7 @@
     <title>Portfolio</title>
     <link rel="stylesheet" href="styles/style.css" />
     <script type="module" src="src/js/main.js"></script>
-    <script src="src/mailer/client.js"></script>
+    <script defer src="src/mailer/client.js"></script>
   </head>
   <body>
     <div class="spinner-background">
@@ -71,16 +71,19 @@
       <div class="contact-wrapper">
         <form class="contact-form">
           <div class="contact-form-headings">
-            <label style="color:red">Name</label>
+            <label>Name</label>
             <input name="Name" id="form-name" required />
-            <label style="color:red">Email</label>
+            <label>Email</label>
             <input name="Email" type="email" id="form-email" required />
-            <label style="color:red">Subject</label>
-            <input name="Subject" id="form-Subject" required />
+            <label>Subject</label>
+            <input name="Subject" id="form-subject" required />
           </div>
           <div class="contact-form-message">
-            <label style="color:red">Message</label>
+            <label>Message</label>
             <textarea rows="9" id="form-message" required></textarea>
+          </div>
+          <div class="contact-form-submit">
+            <button type="button" id="submit">Send</button>
           </div>
         </form>
       </div>

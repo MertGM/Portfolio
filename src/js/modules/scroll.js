@@ -341,17 +341,15 @@ function EventHandler(event) {
 
     // Temporarily disable Auto Scroll to prevent unexpected scrolling when filling out the form.
     
-    else if (event.type == 'focusin') {
+    else if (event.type == 'focusin' && event.target.tagName != 'BUTTON') {
         console.log('form focus in');
-        event.target.style.background = 'blue';
         scroll.state = scroll_state.disabled;
         scroll.trigger = scroll_trigger.none;
     }
 
-    else if (event.type == 'focusout') {
+    else if (event.type == 'focusout' && event.target.tagName != 'BUTTON') {
         console.log('form focus out');
         if (preferences.auto_scroll == 'true') {scroll.state = scroll_state.enabled;}
-        event.target.removeAttribute('style');
     }
 }
 

@@ -5,14 +5,16 @@
   --font-secondary: #389ae0;
   --font-header-primary: #38D0F2;
   --font-p-primary: #1BA0F2;
+  --font-shadow: #f00;
   --border-primary: #2f3aed;
   --btn-primary: #5145ff;
   --btn-secondary: #00a0ff;
+  --btn-hover: #05f;
   --btn-on: #0f5;
   --btn-off: #f25;
   --btn-slider: #aaf;
   --li-hover: #2fedd7;
-  --green0: #2fedd7;
+  --bg-form: #aaf;
 }
 
 body.light {
@@ -20,9 +22,12 @@ body.light {
   --bg-modal-primary: rgba(200,255, 255, 0.3); 
   --font-header-primary: #F5B8B8;
   --font-p-primary: #758898;
+  --font-shadow: #bbb;
   --border-primary: #2f3aed;
   --btn-primary: #F28705;
   --btn-secondary: #e2641b;
+  --btn-hover: #fa8705;
+  --bg-form: #fff;
 }
 
 
@@ -307,6 +312,7 @@ aside ul {
     height: 80%;
     background-color: var(--bg-modal-primary);
     border-radius: 5em;
+    box-shadow: 20px 15px 5px 10px rgb(0, 0, 0, 0.6);
 }
 
 .contact-form {
@@ -320,6 +326,28 @@ aside ul {
     margin-bottom: 3em;
 }
 
+label {
+    color: var(--font-primary);
+    text-shadow: 1px 1px 5px var(--font-shadow);
+}
+
+input, textarea {
+    border-radius: 2em;
+    border: 0;
+    background-color: var(--bg-form);
+    box-shadow: 5px 5px 1px rgb(50, 50, 50, 1);
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+input:focus, textarea:focus, button:focus {
+    outline: 5px ridge var(--bg-primary);
+}
+
+button:focus {
+    outline: 2px ridge var(--bg-primary);
+}
+
 .contact-form-message {
     display: flex;
     flex-direction: column;
@@ -328,6 +356,33 @@ aside ul {
 .contact-form-message > label {
     align-self: center;
     padding-bottom: 1em;
+}
+
+#form-message {
+    margin-bottom: 2em;
+}
+
+.contact-form-submit {
+    display: flex;
+    justify-content: center;
+}
+
+#submit {
+    background-color: var(--btn-primary);
+    padding: 1em;
+    border: 0;
+    border-radius: 2em;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.6),
+                inset -2px -2px 3px rgba(0, 0, 0, 0.6);
+}
+
+#submit:hover {
+    background-color: var(--btn-hover);
+}
+
+#submit:active {
+ box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+             inset 2px 2px 3px rgba(0, 0, 0, 0.6);
 }
 
 
@@ -408,21 +463,21 @@ aside ul {
       width: 35%;
     }
     .container-spaced {
-    border-width: 1em;
-    border-radius: 5em;
-    height: auto;
+      border-width: 1em;
+      border-radius: 5em;
+      height: auto;
     }
 
     p {
-    font-size: 1em;
+      font-size: 1em;
     }
 
     li {
-    font-size: 1em;
+      font-size: 1em;
     }
 
     h1 {
-    font-size: 1.5em;
+      font-size: 1.5em;
     }
     aside {
       left: 90%;
@@ -443,13 +498,13 @@ aside ul {
     }
 
     p {
-    font-size: 1em;
+      font-size: 1em;
     }
     li {
-    font-size: 1em;
+      font-size: 1em;
     }
     h1 {
-    font-size: 2em;
+      font-size: 2em;
     }
     aside {
       left: 93%;
@@ -462,9 +517,9 @@ aside ul {
 @media screen and (min-width: 1900px) {
     p,
     li {
-    font-size: 1.2em;
+      font-size: 1.2em;
     }
     h1 {
-    font-size: 2.5em;
+      font-size: 2.5em;
     }
 }

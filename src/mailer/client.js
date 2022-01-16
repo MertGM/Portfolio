@@ -10,16 +10,17 @@ function Connected(e) {
     console.log("connected: %s", e);
 }
 
-function Send() {
-    var data = document.getElementById('data').value;
-    console.log('send data');
-    ws.send(data);
-}
 
 const ws = new WebSocket('ws://localhost:9999');
 console.log(ws);
 ws.onmessage = Message;
 ws.onopen = Connected;
 
-//const btn = document.querySelector('button');
-//btn.addEventListener('click', Send, false);
+document.getElementById('submit').addEventListener('click', function() {
+    var name = document.getElementById('form-name').value;
+    var email = document.getElementById('form-email').value;
+    var subject = document.getElementById('form-subject').value;
+    var message = document.getElementById('form-message').value;
+    console.log('name: %s\n email: %s\n subject: %s\n message: %s\n', name, email, subject, message);
+    ws.send([name, email, subject, message]);
+});

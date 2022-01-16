@@ -23,6 +23,7 @@ Listen(form);
 AutoScroll();
 
 import {TwinkleStars} from './modules/canvas.js';
+
 if (document.body.clientWidth <= 500) {
     TwinkleStars(100);
 }
