@@ -306,8 +306,6 @@ aside ul {
 
 
 .contact-wrapper {
-    min-width: 300px;
-    min-height: 500px;
     width: 50%;
     height: 80%;
     background-color: var(--bg-modal-primary);
@@ -386,15 +384,24 @@ button:focus {
 }
 
 
+#email-confirmation {
+    position: fixed;
+    width: 20%;
+    height: 30%;
+    padding: 2em;
+    border-radius: 2em;
+    bottom: -40%;
+    right: 0;
+    color: var(--font-primary);
+    background: var(--bg-modal-primary);
+}
+
+
 #github-svg {
     margin-right: auto;
 }
 
 @media screen and (max-width: 600px) {
-    /* TODO: outline doesn't work for keyboard users, but mobile has them
-     * I want the mobile to not have outline and keyboard do.
-       */
-
     .options-menu {
         width: 65%;
     }
@@ -410,7 +417,7 @@ button:focus {
     }
 
     aside {
-      left: 80%;
+      left: 75%;
     }
 
     #moon-shadow {
@@ -444,7 +451,7 @@ button:focus {
       width: 50%;
     }
     aside {
-      left: 85%;
+      left: 80%;
     }
     #links {
       width: 100%;
@@ -507,7 +514,7 @@ button:focus {
       font-size: 2em;
     }
     aside {
-      left: 93%;
+      left: 92%;
     }
     #links {
       width: 70%;
@@ -521,5 +528,9 @@ button:focus {
     }
     h1 {
       font-size: 2.5em;
+    }
+
+    aside {
+      left: 95%;
     }
 }

@@ -12,6 +12,7 @@ var buttonScrollOuter = document.querySelector('.outer-button');
 var nav = document.querySelector('.nav'); 
 var sunShadow = document.getElementById('sun-shadow');
 var moonShadow = document.getElementById('moon-shadow');
+var emailModal = document.getElementById('email-confirmation');
 
 // We show the options menu at the start, because css messes up transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
@@ -94,6 +95,8 @@ var buttonFillAnimation = buttonScrollOuter.animate([
       duration: 500
     });
 buttonFillAnimation.pause();
+
+
 
 var optionsFill;
 var color1;
@@ -260,6 +263,17 @@ function ThemeSwitch() {
     InitButtonAnimation();
     localStorage.setItem('theme', theme);
 }
+
+
+var emailModalAnimation = emailModal.animate([
+    { bottom: '-40%'},
+    { bottom: '5%'}
+    ], {
+      fill: 'forwards',
+      easing: 'ease-in-out',
+      duration: 500
+    });
+emailModalAnimation.pause();
 
 
 export function Options(e) {
@@ -432,5 +446,27 @@ export function PreloadAnimations() {
         buttonAnimation.play();
         buttonFillAnimation.playbackRate = 20;
         buttonFillAnimation.play();
+    }
+}
+
+
+export function ConfirmEmailAnimation() {
+    console.log('show email modal')
+    console.log('playState %o', emailModalAnimation.playState);
+
+    // This prevents animation playing while already running
+    if (emailModalAnimation.playState == 'paused') {
+        emailModalAnimation.playbackRate = 1;
+        emailModalAnimation.play();
+        emailModalAnimation.finished.then(function() {
+            setTimeout(function() {
+                emailModalAnimation.playbackRate = -1;
+                emailModalAnimation.play();
+                emailModalAnimation.finished.then(function() {
+                    emailModalAnimation.pause();
+                });
+                console.log('disappear email modal')
+            }, 5000);
+        });
     }
 }

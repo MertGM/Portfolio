@@ -1,6 +1,5 @@
 //
-// TODO: Fix scrolling issue when reloading the page.
-// Page sometimes scrolls back to the top from the last position on the page; which fires scroll event and causes auto scroll to behave incorrectly.
+// TODO: Fix firefox and ios browsers scrolling not function not properly
 //
 
 
