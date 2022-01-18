@@ -13,7 +13,7 @@ login_password = os.getenv("OUTLOOK_PASSWORD")
 context = ssl.create_default_context()
 
 async def send_mail(message, websocket):
-    # Todo: Check which mail server the user uses
+    # Supported mail servers are Outlook and Gmail, as far as I know; Outlook's smtp can send email to gmail and vice vera
     message_content = f"""From: {login_username}\n To: {message[1]}\n Subject: {message[2]}\n
     Hi {message[0]},\n
     thanks for reaching out to me, I will read your mail and respond as soon as possible.\n

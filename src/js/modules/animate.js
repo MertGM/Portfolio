@@ -172,6 +172,7 @@ var navAnims = [];
 var navCollapsed = true;
 var navLeftOffset = 0;
 var aside = document.querySelector('aside');
+// 0 = mouseover, 1 = mouseout
 var navCurrentTarget;
 var resizing = false;
 
@@ -266,8 +267,8 @@ function ThemeSwitch() {
 
 
 var emailModalAnimation = emailModal.animate([
-    { bottom: '-40%'},
-    { bottom: '5%'}
+    { bottom: '-250px'},
+    { bottom: '50px'}
     ], {
       fill: 'forwards',
       easing: 'ease-in-out',
@@ -338,12 +339,14 @@ function SetAutoScroll() {
 }
 
 
+// @cleanup instead of multiple variables have a bitfield or better solution to handle it better.
+// Bug: sometimes the nav will collapse twice due to setTimeout queueing it twice.
 function NavAnimation(e) {
     if (e.target.tagName == 'LI') {
         console.log('target type %o', e.type);
         console.log('navCollapsed %s', navCollapsed);
         if (e.type == 'mouseover') {
-            navCurrentTarget = 'mouseover';
+            navCurrentTarget = 0;
             if (navCollapsed && resizing == false) {
                 for (var i = 0; i < navAnims.length; i++) {
                     navAnims[i].playbackRate = 1;
@@ -364,10 +367,10 @@ function NavAnimation(e) {
         }
 
         else if (e.type == 'mouseout' && navCollapsed == false) {
-            navCurrentTarget = 'mouseout';
+            navCurrentTarget = 1;
             setTimeout(function() {
                 console.log('nav current target', navCurrentTarget);
-                if (navCurrentTarget == 'mouseout') {
+                if (navCurrentTarget == 1) {
                     resizing = true;
 
                     for (var i = 0; i < navAnims.length; i++) {

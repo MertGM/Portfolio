@@ -1,8 +1,3 @@
-//
-// TODO: Fix firefox and ios browsers scrolling not function not properly
-//
-
-
 var preferences = {
     // Local storage uses utf-16 characters
     auto_scroll: 'true'
@@ -97,16 +92,14 @@ function Easein(t, p0,p1,p2) {
 function Scrolldown(dis=1) {
     var t = 0;
     var sum = 0;
-    function Loop() {
+    (function Loop() {
         if (scroll.state == scroll_state.enabled) {
             scroll.state = scroll_state.scrolling;
             sum = scroll.node.y[scroll.index+dis];
-            scroll.currentScrollY = window.scrollY;
 
             // Have as starting point the current scroll y, so that we can 
             // smoothly scroll to the destination
             scroll.prevScrollY = scroll.currentScrollY;
-            console.log('click');
             console.log('Sum %c%s  ', 'color: green;', sum);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
@@ -143,16 +136,14 @@ function Scrolldown(dis=1) {
         console.log('scrolled down');
 
         requestAnimationFrame(Loop);
-    }
-
-    requestAnimationFrame(Loop);
+    }());
 }
 
 
 function Scrollup(dis=-1) {
     var t = 0;
     var sum = 0;
-    function Loop() {
+    (function Loop() {
         if (scroll.state == scroll_state.enabled) {
             // When scrolling without Auto Scroll index will decrement by 1 if scrollY =  container[i] height - y offset.
             // Scrolling will now overscroll because index decremented twice. 
@@ -160,9 +151,7 @@ function Scrollup(dis=-1) {
             if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
             scroll.state = scroll_state.scrolling;
             sum = scroll.node.y[scroll.index+dis];
-            scroll.currentScrollY = window.scrollY;
             scroll.prevScrollY = scroll.currentScrollY;
-            console.log('click');
             console.log('Sum %c%s  ', 'color: green;', sum);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
@@ -196,8 +185,7 @@ function Scrollup(dis=-1) {
         console.log('scrolled up');
 
         requestAnimationFrame(Loop);
-    }
-    requestAnimationFrame(Loop);
+    }());
 }
 
 function Sum(htmlCollection, start, stop) {
@@ -246,12 +234,21 @@ function EventHandler(event) {
     if (event.type == 'resize') {
         console.log('resizing page');
         var containers = document.querySelectorAll('.container100');
+        var links = document.getElementById('links');
 
         for (var i = 0; i < containers.length; i++) {
             scroll.node.y[i] = Sum(containers, 0, i);
         }
 
         console.log('resized scroll node y: %o', scroll.node.y);
+
+        // Remove links from document so that mobile users see more of the contact form.
+        if (scroll.node.y[1] <= 400) {
+            links.style.display = 'none';
+        }
+        else if (links.getAttribute('style') != null) {
+            links.removeAttribute('style');
+        }
     }
 
     else if (event.type == 'scroll' && event.target == document) {
@@ -408,6 +405,7 @@ export function Listen(el, nav=false) {
         navNodes.id.array = Object.keys(navNodes.id);
         el.addEventListener('click', EventHandler, false);
         console.log('Added event listener on %o', el);
+        console.log('navNodes %o', navNodes);
     }
 
     else if (el.tagName == 'FORM') {

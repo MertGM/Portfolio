@@ -30,7 +30,7 @@ function Connected(e) {
 }
 
 
-const ws = new WebSocket('ws://localhost:9999');
+const ws = new WebSocket('ws://192.168.178.28:9999');
 console.log(ws);
 ws.onmessage = Message;
 ws.onopen = Connected;
@@ -42,5 +42,22 @@ document.getElementById('submit').addEventListener('click', function() {
     var message = document.getElementById('form-message').value;
     console.log('name: %s\n email: %s\n subject: %s\n message: %s\n', name, email, subject, message);
     // Todo: Allow sending email to happen only after like 5 seconds after a previously sent email.
-    ws.send([name, email, subject, message]);
+    // readyState 3 = closed
+    if (ws.readyState != 3) {
+        ws.send([name, email, subject, message]);
+    }
+    else {
+        var email_confirm = document.querySelectorAll('.email-confirmation-text');
+        var confirm_message1 = email_confirm[0].innerText;
+        var confirm_message2 = email_confirm[1].innerText;
+
+        email_confirm[0].innerText = "Oops, mail server is down.";
+        email_confirm[1].innerText = "Try again later or contact me manually via the email icon.";
+        ConfirmEmailAnimation();
+        setTimeout(function() {
+            email_confirm[0].innerText = confirm_message1;
+            email_confirm[1].innerText = confirm_message2;
+        }, 6000);
+        console.log('Mail server is down, failed to send email, error');
+    }
 });
