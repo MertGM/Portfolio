@@ -1,6 +1,13 @@
+// 
+// Bug: Resize event and click event gets fired multiple times when you switch from back from an other tab.
+// although this chrome doesn't do this, the problem is that scrolling now causes hitching, great...
+// Firefox causes it to randomly scroll up or down and causes a small hitch.
+// For now I don't know how to fix this since this is the browser's implementation fault.
+//
+
 var preferences = {
     // Local storage uses utf-16 characters
-    auto_scroll: 'true'
+    auto_scroll: true
 };
 
 var scroll_state = {
@@ -23,10 +30,14 @@ var scroll = {
     trigger: scroll_trigger.none,
     node: Array.from(document.body.children),
     index: 0,
+    visibleChange: false,
 };
 
 // Local storage should already be set by animate.js since that is loaded first, so we don't need to check for undefined or null.
-preferences.auto_scroll = localStorage.getItem('auto scroll');
+if (localStorage.getItem('auto scroll') == 'false') {   // Default is 'true' and enabled
+    preferences.auto_scroll = false;
+    scroll.state = scroll_state.disabled;
+}
 
 
 // Object has an id object and index array of the 'navigation' elements.
@@ -95,11 +106,8 @@ function Scrolldown(dis=1) {
     (function Loop() {
         if (scroll.state == scroll_state.enabled) {
             scroll.state = scroll_state.scrolling;
-            sum = scroll.node.y[scroll.index+dis];
-
-            // Have as starting point the current scroll y, so that we can 
-            // smoothly scroll to the destination
             scroll.prevScrollY = scroll.currentScrollY;
+            sum = scroll.node.y[scroll.index+dis];
             console.log('Sum %c%s  ', 'color: green;', sum);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
@@ -107,11 +115,6 @@ function Scrolldown(dis=1) {
         console.log('prev index %s', scroll.index);
         console.log('Sum %c%s  ', 'color: blue;', sum);
         console.log('dis %c%s  ', 'color: red;', dis);
-
-
-        // Having the control point closer to the destination makes scrolling ease out
-        // and further ease in.
-        // The default atm is ease out.
         
         if (scroll.currentScrollY >= sum) {
             // End of scrolling
@@ -127,6 +130,10 @@ function Scrolldown(dis=1) {
             return;
         }
 
+        // Having the control point closer to the destination makes scrolling ease out
+        // and further ease in.
+        // The default atm is ease out.
+        
         scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum);
         t+= 0.02;
 
@@ -150,8 +157,8 @@ function Scrollup(dis=-1) {
             // Thus incrementing the index will fix this.
             if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
             scroll.state = scroll_state.scrolling;
-            sum = scroll.node.y[scroll.index+dis];
             scroll.prevScrollY = scroll.currentScrollY;
+            sum = scroll.node.y[scroll.index+dis];
             console.log('Sum %c%s  ', 'color: green;', sum);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
         }
@@ -207,7 +214,7 @@ function CurrentNode() {
             console.log('index %s', scroll.index);
 
             // Change index if page is scrolling without auto scroll
-            if (preferences.auto_scroll == 'false') {scroll.index++;}
+            if (preferences.auto_scroll == false) {scroll.index++;}
         }
 
         else if ((window.scrollY <= ((scroll.node.y[scroll.index]) - yOffset))) {
@@ -217,7 +224,7 @@ function CurrentNode() {
             console.log('changed color on scroll up');
             console.log('index %s', scroll.index);
 
-            if (preferences.auto_scroll == 'false') {scroll.index--;}
+            if (preferences.auto_scroll == false) {scroll.index--;}
 
         }
 }
@@ -253,10 +260,9 @@ function EventHandler(event) {
 
     else if (event.type == 'scroll' && event.target == document) {
         // Only start executing the function if page isn't scrolling already.
-        
-        if (scroll.state == scroll_state.enabled && preferences.auto_scroll == 'true') {
+        if (scroll.state == scroll_state.enabled && preferences.auto_scroll == true) {
             scroll.trigger = scroll_trigger.scroll;
-            requestAnimationFrame(ScrollToNextNode);
+            ScrollToNextNode();
         }
 
         // The click block already handles the scroll index
@@ -275,12 +281,20 @@ function EventHandler(event) {
         
         if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer' || 
             event.target.id == 'options-icons') {
+
+            // Getting the value requires some time, so we need the lambda function, continueing when it returns.
             var done = (function() {
-                preferences.auto_scroll = localStorage.getItem('auto scroll');
+                if (localStorage.getItem('auto scroll') == 'true') {
+                    preferences.auto_scroll = true;
+                }
+                else {
+                    preferences.auto_scroll = false;
+                }
+
                 return true;
             })();
             if (done) {
-                if (preferences.auto_scroll == 'true') {
+                if (preferences.auto_scroll) {
                     scroll.state = scroll_state.enabled;
 
                     // Save the current window scroll y when activating auto scroll,
@@ -295,15 +309,15 @@ function EventHandler(event) {
             }
         }
 
-        if (scroll.state != scroll_state.scrolling && event.target.id == navNodes.id[event.target.id]) {
+        else if (scroll.state != scroll_state.scrolling && event.target.id == navNodes.id[event.target.id]) {
 
             console.log('nav found in handler: %s', navNodes.id[event.target.id]);
             var displacement = 0;
 
             for (var i = 0; i < navNodes.id.array.length; i++) {
                 if (event.target.id == navNodes.id.array[i]) {
-                    scroll.prevScrollY = scroll.node.y[scroll.index];
                     displacement = i - scroll.index;
+                    break;
                 }
             }
 
@@ -345,9 +359,10 @@ function EventHandler(event) {
 
     else if (event.type == 'focusout' && event.target.tagName != 'BUTTON') {
         console.log('form focus out');
-        if (preferences.auto_scroll == 'true') {scroll.state = scroll_state.enabled;}
+        if (preferences.auto_scroll) {scroll.state = scroll_state.enabled;}
     }
 }
+
 
 // Enable auto scrolling for the given page.
 export function AutoScroll() {
