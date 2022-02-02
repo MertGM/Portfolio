@@ -33,3 +33,7 @@ else if (document.body.clientWidth <= 1200) {
 else if (document.body.clientWidth >= 1200) {
     TwinkleStars(300);
 }
+
+
+import {Slider} from './modules/slider.js';
+Slider(['discord_examples.png', 'discord_example1.png', 'discord_example2.png', 'discord_example3.png'], 'discord')

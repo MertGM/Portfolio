@@ -5,13 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css" />
     <script type="module" src="src/js/main.js"></script>
     <script type="module" src="src/mailer/client.js"></script>
   </head>
   <body>
     <div class="spinner-background">
-        <img id="spinner" src="images/Dark_atmosphere.gif">
+        <img id="spinner" src="assets/Dark_atmosphere.gif">
     </div>
     <svg id="close-button-wrapper" viewbox="0 0 50 80">
       <circle id="outer-circle" cy="23%" cx="20%" r="14" stroke-width="5px" fill="none" />
@@ -53,11 +56,85 @@
     <div class="container100 about">
       <h1>About me</h1>
       <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero, alias.
+        Welcome to my world, a world I can share my imagination to the world!
+      </p>
+      <p>
+        I've always been fascinated by the possibilities a computer has:
+      </p>
+      <p>
+        communicating to someone on the other side of the earth, 
+        hundred of images being shown a second which we call a video, 
+        zillion of pixels moving around that recreate our world which we call games.
+      </p>
+      <p>
+        All inside a computer that consists of transistors, and thus physics.</p>
       </p>
     </div>
     <div class="container100 projects">
       <h1>Projects</h1>
+      <div class="cards-wrapper">
+        <div class="card">
+          <h3 class="card-title">
+            Portfolio
+          </h3>
+          <p class="card-description">
+            Description
+          </p>
+          <div class="card-links">
+            <a class="card-live" href="#" target="_blank" rel="noreferrer">
+              <p>
+                View live
+              </p>
+            </a>
+            <a class="card-source" href="#" target="_blank" rel="noreferrer">
+              <p>
+                Source code
+              </p>
+            </a>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">
+            Portfolio
+          </h3>
+          <div class="slider">
+            <canvas class="canvas-slider discord" width=1200 height=150>
+            </canvas>
+            <div class="arrow-left">
+              <img class="slide-left" src="assets/arrow_left.svg">
+            </div>
+            <div class="arrow-right">
+              <img class="slide-right" src="assets/arrow_right.svg">
+            </div>
+          </div>
+          <p class="card-description">
+            Description
+          </p>
+          <div class="card-links">
+            <a class="card-source" href="#" target="_blank" rel="noreferrer">
+              <p>
+                Source code
+              </p>
+            </a>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">
+            Portfolio
+          </h3>
+          <p class="card-description">
+            Description
+          </p>
+          <div class="card-links">
+            <a class="card-source" href="#" target="_blank" rel="noreferrer">
+              <p>
+                Source code
+              </p>
+            </a>
+          </div>
+        </div>
+
+      </div>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum
         dolore incidunt veniam porro labore, minima velit eius eaque quod neque.
@@ -86,10 +163,10 @@
       </div>
       <div id="links">
       <a id="github-link" href="https://github.com/MertGM" target="_blank" rel="noreferrer">
-        <img id="github-svg" src="images/github.svg" alt="github logo">
+        <img id="github-svg" src="assets/github.svg" alt="github logo">
       </a>
       <a id="email-link" href="mailto:mertdalkiran@hotmail.com" target="_blank" rel="noreferrer">
-        <img src="images/mail.svg" alt="email logo">
+        <img src="assets/mail.svg" alt="email logo">
       </a>
       </div>
     </div>
