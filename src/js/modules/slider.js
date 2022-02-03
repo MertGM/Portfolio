@@ -7,13 +7,13 @@ var imageHeight;
 var ctx;
 var sliderImages = [];
 var imageIndex = 0;
+var sliding = false;
 
 function Lerp(p1, p2, t) {
     return ((1-t) * p1 + p2*t)
 }
 
 function Slide(e) {
-    console.log('slide')
     var t = 0;
     var x = 0;
 
@@ -24,45 +24,39 @@ function Slide(e) {
         var direction = -1;
     }
 
-    if (imageIndex == 0 && direction == -1) {
-        imageIndex = sliderImages.length-1;
-    }
-    else if (imageIndex == sliderImages.length-1 && direction == 1) {
-        imageIndex = 0;
-    }
-
-    console.log('imgIndex %s', imageIndex);
     function Loop() {
         if (t <= 1.05) {
+            sliding = true;
             ctx.save();
-            console.log('loop');
             ctx.clearRect(0,0, imageWidth, imageHeight);
             x = Lerp(0, imageWidth, t);
-            console.log('x: %s', x);
-            console.log('t: %s', t);
+
             if (direction == 1) {
                 ctx.translate(-x, 0);
+                // Javascript returns a negative value on -a mod n, so we have to add n to get a positive value.
+                ctx.drawImage(sliderImages[((((imageIndex+direction)%sliderImages.length) + sliderImages.length) % sliderImages.length)], imageWidth, 0, imageWidth, imageHeight);
             }
+
             else {
                 ctx.translate(x, 0);
+                ctx.drawImage(sliderImages[((((imageIndex-1)%sliderImages.length) + sliderImages.length) % sliderImages.length)], -imageWidth, 0, imageWidth, imageHeight);
             }
-            ctx.drawImage(sliderImages[imageIndex], 0, 0, imageWidth, imageHeight);
-            if (direction == 1) {
-                ctx.drawImage(sliderImages[imageIndex+direction], imageWidth, 0, imageWidth, imageHeight);
-            }
-            else {
-                ctx.drawImage(sliderImages[imageIndex-1], -imageWidth, 0, imageWidth, imageHeight);
-            }
+
+            ctx.drawImage(sliderImages[(((imageIndex%sliderImages.length) + sliderImages.length) % sliderImages.length)], 0, 0, imageWidth, imageHeight);
 
             t += 0.05;
             ctx.restore();
             requestAnimationFrame(Loop);
         }
+
         else {
             imageIndex += direction;
+            sliding = false;
         }
     }
-    Loop();
+    if (!sliding) {
+        Loop();
+    }
 }
 function SetImage(image, i) {
     image.onload = function() {
@@ -87,7 +81,6 @@ export function Slider(images, canvas) {
         sliderImage.referrerPolicy = 'no-referrer';
         sliderImage.src = document.location + 'assets/' + images[i];
         SetImage(sliderImage, i);
-        console.log('slider Image %o', sliderImage)
     }
     
 
