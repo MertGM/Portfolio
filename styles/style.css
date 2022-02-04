@@ -1,48 +1,48 @@
 :root {
-  --bg-primary: #003;
-  --bg-modal-primary: rgba(85,180, 255, 0.3); 
-  --font-primary: #31d9f7;
-  --font-secondary: #389ae0;
-  --font-header-primary: #38D0F2;
-  --font-p-primary: #1BA0F2;
-  --font-shadow: #f00;
-  --border-primary: #2f3aed;
-  --btn-primary: #5145ff;
-  --btn-secondary: #00a0ff;
-  --btn-hover: #05f;
-  --btn-on: #0f5;
-  --btn-off: #f25;
-  --btn-slider: #aaf;
-  --li-hover: #2fedd7;
-  --card-primary: #207;
-  --bg-form: #aaf;
+    --bg-primary: #003;
+    --bg-modal-primary: rgba(85,180, 255, 0.3); 
+    --font-primary: #31d9f7;
+    --font-secondary: #389ae0;
+    --font-header-primary: #38D0F2;
+    --font-p-primary: #1BA0F2;
+    --font-shadow: #f00;
+    --border-primary: #2f3aed;
+    --btn-primary: #5145ff;
+    --btn-secondary: #00a0ff;
+    --btn-hover: #05f;
+    --btn-on: #0f5;
+    --btn-off: #f25;
+    --btn-slider: #aaf;
+    --li-hover: #2fedd7;
+    --card-primary: #207;
+    --bg-form: #aaf;
 }
 
 body.light {
-  --bg-primary: #ddf;
-  --bg-modal-primary: rgba(200,255, 255, 0.3); 
-  --font-header-primary: #F5B8B8;
-  --font-p-primary: #758898;
-  --font-shadow: #bbb;
-  --border-primary: #2f3aed;
-  --btn-primary: #F28705;
-  --btn-secondary: #e2641b;
-  --btn-hover: #fa8705;
-  --card-primary: #aac;
-  --bg-form: #fff;
+    --bg-primary: #ddf;
+    --bg-modal-primary: rgba(200,255, 255, 0.3); 
+    --font-header-primary: #F5B8B8;
+    --font-p-primary: #758898;
+    --font-shadow: #bbb;
+    --border-primary: #2f3aed;
+    --btn-primary: #F28705;
+    --btn-secondary: #e2641b;
+    --btn-hover: #fa8705;
+    --card-primary: #aac;
+    --bg-form: #fff;
 }
 
 * {
-  font-family: 'Yuji Mai', serif;
+    font-family: 'Yuji Mai', serif;
 }
 
 html,
 body {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  background-color: var(--bg-primary);
-  margin: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: var(--bg-primary);
+    margin: 0;
 }
 
 
@@ -103,10 +103,12 @@ body {
 }
 
 .container100 p {
-  font-size: 1rem;
-  margin: 0.2em;
-  max-width: 60%;
+    font-size: 1rem;
+    margin: 0.2em;
+}
 
+.about p {
+    max-width: 60%;
 }
 
 .options-menu {
@@ -174,8 +176,8 @@ body {
 }
 
 .options li {
-  list-style-type: none;
-  margin-bottom: 2em;
+    list-style-type: none;
+    margin-bottom: 2em;
 }
 
 /* name of the settings being a nested flexbox, to make 1 row of columns */
@@ -249,21 +251,21 @@ body {
 }
 
 .text-center {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  color: var(--font-secondary);
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    color: var(--font-secondary);
 }
 
 
 .container100 {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  background-color: var(--bg-primary);
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background-color: var(--bg-primary);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .container100 h1 {
@@ -276,47 +278,47 @@ body {
 
 
 .container-spaced {
-  display: flex;
-  flex-wrap: wrap;
-  width: 60%;
-  height: auto;
-  justify-content: space-between;
-  border-color: var(--border-primary);
-  border-width: 1rem;
-  border-radius: 5rem;
-  border-style: solid;
+    display: flex;
+    flex-wrap: wrap;
+    width: 60%;
+    height: auto;
+    justify-content: space-between;
+    border-color: var(--border-primary);
+    border-width: 1rem;
+    border-radius: 5rem;
+    border-style: solid;
 }
 
 
 aside {
-  display: block;
-  position: absolute;
-  height: auto;
-  top: 40%;
-  bottom: 0;
-  right: 0;
-  z-index: 1;
+    display: block;
+    position: absolute;
+    height: auto;
+    top: 40%;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
 }
-aside ul {
-  position: fixed;
-  display: block;
-  padding-bottom: 1em;
+.nav {
+    position: fixed;
+    display: block;
+    padding-bottom: 1em;
 }
 
 .nav li {
-  list-style-type: none;
-  color: rgba(255, 0, 100, 0);
-  cursor: pointer;
-  padding: 0.2em 1em 0.4em 1.5em;
-  margin-bottom: 1em;
-  border-radius: 1em;
-  background-color: rgba(255, 0, 100, 0.5);
+    list-style-type: none;
+    color: rgba(255, 0, 100, 0);
+    cursor: pointer;
+    padding: 0.2em 1em 0.4em 1.5em;
+    margin-bottom: 1em;
+    border-radius: 1em;
+    background-color: rgba(255, 0, 100, 0.5);
 }
 
 
 .cards-wrapper {
     display: flex;
-    width: 80%;
+    width: 100%;
     height: 100%;
     flex-flow: row wrap;
 }
@@ -334,8 +336,8 @@ aside ul {
     background-color: var(--card-primary);
 }
 
-.card p {
-    margin: 0;
+.card-description {
+    padding-bottom: 0.2em;
 }
 
 .card-links {
@@ -358,15 +360,8 @@ aside ul {
 
 
 .slider {
-    width: 100%;
-    height: 150px;
     position: relative;
-    overflow: hidden;
-}
-
-.canvas-slider {
-    width: 1200px;
-    height: 100%;
+    z-index: 2;
 }
 
 .arrow-left {
@@ -504,12 +499,12 @@ a {
     }
     
     .container-spaced {
-    border-width: 0.4em;
-    border-radius: 3em;
+        border-width: 0.4em;
+        border-radius: 3em;
     }
 
     aside {
-      left: 75%;
+        left: 75%;
     }
 
     #moon-shadow {
@@ -527,7 +522,7 @@ a {
         font-size: 0.7em;
     }
     li {
-      font-size: 0.65em;
+        font-size: 0.65em;
     }
     
     .contact-wrapper {
@@ -553,47 +548,67 @@ a {
         margin-top: 10px;
     }
 
+
+    .projects {
+        height: 900px;
+    }
+
+    .cards-wrapper {
+        flex-direction: column;
+    }
+
+    .card {
+    /* A little bit more space for the description */
+        height: 370px;
+        margin-left: 0.1em;
+        margin-bottom: 1em;
+        margin-right: 0;
+        margin-top: 0;
+    }
+
 }
 
 
 @media screen and (min-width: 600px) {
     .options-menu {
-      width: 50%;
+        width: 50%;
     }
     aside {
-      left: 80%;
+        left: 80%;
     }
 }
 
 @media screen and (min-width: 900px) {
     .options-menu {
-      width: 35%;
+        width: 35%;
     }
     .container-spaced {
-      border-width: 1em;
-      border-radius: 5em;
-      height: auto;
+        border-width: 1em;
+        border-radius: 5em;
+        height: auto;
     }
 
     p {
-      font-size: 1em;
+        font-size: 1em;
     }
 
     li {
-      font-size: 1em;
+        font-size: 1em;
     }
 
     h1 {
-      font-size: 1.5em;
+        font-size: 1.5em;
     }
     aside {
-      left: 90%;
+        left: 90%;
     }
+
+
 }
 
 @media screen and (min-width: 1400px) {
     .options-menu {
-      width: 20%;
+        width: 20%;
     }
     .options ul {
         padding-left: 1.5em;
@@ -601,33 +616,38 @@ a {
     }
 
     .container-spaced {
-      height: 60%;
+        height: 60%;
     }
 
     p {
-      font-size: 1em;
+        font-size: 1em;
     }
     li {
-      font-size: 1em;
+        font-size: 1em;
     }
     h1 {
-      font-size: 2em;
+        font-size: 2em;
     }
     aside {
-      left: 92%;
+        left: 92%;
+    }
+
+    .cards-wrapper {
+        width: 80%;
+        height: 100%;
     }
 }
 
 @media screen and (min-width: 1900px) {
     p,
     li {
-      font-size: 1.2em;
+        font-size: 1.2em;
     }
     h1 {
-      font-size: 2.5em;
+        font-size: 2.5em;
     }
 
     aside {
-      left: 95%;
+        left: 95%;
     }
 }

@@ -8,6 +8,7 @@ var ctx;
 var sliderImages = [];
 var imageIndex = 0;
 var sliding = false;
+var card = document.querySelector('.card');
 
 function Lerp(p1, p2, t) {
     return ((1-t) * p1 + p2*t)
@@ -76,7 +77,7 @@ export function Slider(images, canvas) {
     var dx = 0;
     
     for (var i = 0; i < images.length; i++) {
-        const sliderImage = new Image(300, 150);
+        const sliderImage = new Image(canvasWidth, canvasHeight);
         sliderImage.crossOrigin = 'anonymous';
         sliderImage.referrerPolicy = 'no-referrer';
         sliderImage.src = document.location + 'assets/' + images[i];
