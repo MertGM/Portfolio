@@ -336,15 +336,12 @@ aside {
     background-color: var(--card-primary);
 }
 
-.card-description {
-    padding-bottom: 0.2em;
-}
-
 .card-links {
     position: absolute;
     padding-bottom: 1em;
     bottom: 0;
 }
+
 .card-live {
     margin-right: 1em;
 }
