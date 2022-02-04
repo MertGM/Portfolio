@@ -156,6 +156,7 @@ export function TwinkleStars(amount) {
 
 
 // Probably not gonna use this because of the delay
+/*
 export function StopTwinkleStars() {
     for (var i = 0; i < intervalIds.length; i++) {
         clearInterval(intervalIds[i]);
@@ -169,4 +170,4 @@ export function StopTwinkleStars() {
         ctx.clearRect(0, 0, width, height);
     }, 20000);
 
-}
+}*/

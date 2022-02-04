@@ -17,10 +17,6 @@ var nav = document.querySelector('.nav');
 
 var emailModal = document.getElementById('email-confirmation');
 
-var slider = document.querySelector('.slider')
-var arrowLeft = document.querySelector('.arrow-left')
-var arrowRight = document.querySelector('.arrow-right')
-
 // We show the options menu at the start, because css messes up transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
@@ -172,26 +168,6 @@ var sunAnimation = sun.animate([
 sunAnimation.pause();
 
 
-var arrowsVisible = false;
-var arrowLeftHoverAnimation = arrowLeft.animate([
-    { opacity: 1},
-    ], {
-        fill: 'forwards',
-        easing: 'ease-in-out',
-        duration: 300
-});
-arrowLeftHoverAnimation.pause();
-
-var arrowRightHoverAnimation = arrowRight.animate([
-    { opacity: 1},
-    ], {
-        fill: 'forwards',
-        easing: 'ease-in-out',
-        duration: 300
-});
-arrowRightHoverAnimation.pause();
-
-
 var navColor = getComputedStyle(nav).getPropertyValue('--li-hover');
 var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
 var navAnims = [];
@@ -293,7 +269,6 @@ function ThemeSwitch() {
 
 
 var emailModalAnimation = emailModal.animate([
-    { bottom: '-250px'},
     { bottom: '50px'}
     ], {
       fill: 'forwards',
@@ -418,26 +393,6 @@ function NavAnimation(e) {
 }
 
 
-function SliderArrows() {
-    if (!arrowsVisible) {
-        console.log('show arrows')
-        arrowsVisible = true;
-        arrowLeftHoverAnimation.playbackRate = 1;
-        arrowRightHoverAnimation.playbackRate = 1;
-        arrowLeftHoverAnimation.play();
-        arrowRightHoverAnimation.play();
-    }
-    else {
-        console.log('hide arrows')
-        arrowsVisible = false;
-        arrowLeftHoverAnimation.playbackRate = -1;
-        arrowRightHoverAnimation.playbackRate = -1;
-        arrowLeftHoverAnimation.play();
-        arrowRightHoverAnimation.play();
-    }
-}
-
-
 export function Animate() {
     InitButtonAnimation();
     buttonScroll.addEventListener('mousedown', SetAutoScroll, false);
@@ -448,9 +403,6 @@ export function Animate() {
     sun.addEventListener('mousedown', ThemeSwitch, false);
     nav.addEventListener('mouseover', NavAnimation, false);
     nav.addEventListener('mouseout', NavAnimation, false);
-
-    slider.addEventListener('mouseenter', SliderArrows, false);
-    slider.addEventListener('mouseleave', SliderArrows, false);
 }
 
 export function PreloadAnimations() {

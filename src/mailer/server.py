@@ -4,11 +4,12 @@ import smtplib
 import ssl
 import os
 from email.mime.text import MIMEText
+from getpass import getpass
 
 port = 587
 mail_server = "smtp.office365.com"
 login_username = os.getenv("OUTLOOK_USERNAME")
-login_password = os.getenv("OUTLOOK_PASSWORD")
+login_password = getpass()
 
 context = ssl.create_default_context()
 

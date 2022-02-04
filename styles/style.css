@@ -88,6 +88,7 @@ body {
 .spinner-background#hidden {
     display: none;
 }
+
 .spinner-background svg {
     height: 100%;
     width: 100%;
@@ -106,6 +107,7 @@ body {
     font-size: 1rem;
     margin: 0.2em;
 }
+
 
 .about p {
     max-width: 60%;
@@ -260,7 +262,8 @@ body {
 
 .container100 {
     display: flex;
-    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
     width: 100%;
     background-color: var(--bg-primary);
     flex-direction: column;
@@ -276,17 +279,9 @@ body {
     color: var(--font-p-primary);
 }
 
-
-.container-spaced {
-    display: flex;
-    flex-wrap: wrap;
-    width: 60%;
-    height: auto;
-    justify-content: space-between;
-    border-color: var(--border-primary);
-    border-width: 1rem;
-    border-radius: 5rem;
-    border-style: solid;
+.projects {
+    min-height: 100%;
+    max-height: 900px;
 }
 
 
@@ -327,7 +322,7 @@ aside {
     display: flex;
     position: relative;
     width: 300px;
-    height: 350px;
+    height: 370px;
     border-radius: 1em;
     flex-direction: column;
     align-items: center;
@@ -354,6 +349,9 @@ aside {
     display: inline;
 }
 
+.card-links img {
+    float: right;
+}
 
 
 .slider {
@@ -465,14 +463,18 @@ button:focus {
 #email-confirmation {
     position: fixed;
     width: 200px;
-    height: 150px;
+    min-height: 150px;
     padding: 20px;
     border-radius: 50px;
-    bottom: -250px;
+    bottom: -300px;
     right: 0;
     color: var(--font-primary);
     background: var(--bg-modal-primary);
     margin-right: 15px;
+}
+
+.email-confirmation-text {
+    margin-bottom: 0.2em;
 }
 
 
@@ -546,17 +548,11 @@ a {
     }
 
 
-    .projects {
-        height: 900px;
-    }
-
     .cards-wrapper {
         flex-direction: column;
     }
 
     .card {
-    /* A little bit more space for the description */
-        height: 370px;
         margin-left: 0.1em;
         margin-bottom: 1em;
         margin-right: 0;

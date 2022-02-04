@@ -1,3 +1,4 @@
+// @Future: more sliders will be in the DOM as there will be more cards.
 var arrowLeft = document.querySelector('.arrow-left')
 var arrowRight = document.querySelector('.arrow-right')
 var canvasWidth;
@@ -9,6 +10,49 @@ var sliderImages = [];
 var imageIndex = 0;
 var sliding = false;
 var card = document.querySelector('.card');
+var slider = document.querySelector('.slider')
+var discordDescriptions = document.querySelectorAll('.discord');
+var fadeDescriptionAnimations = [];
+
+
+var arrowsVisible = false;
+var arrowLeftHoverAnimation = arrowLeft.animate([
+    { opacity: 1},
+    ], {
+        fill: 'forwards',
+        easing: 'ease-in-out',
+        duration: 300
+});
+arrowLeftHoverAnimation.pause();
+
+var arrowRightHoverAnimation = arrowRight.animate([
+    { opacity: 1},
+    ], {
+        fill: 'forwards',
+        easing: 'ease-in-out',
+        duration: 300
+});
+arrowRightHoverAnimation.pause();
+
+
+function SliderArrows() {
+    if (!arrowsVisible) {
+        console.log('show arrows')
+        arrowsVisible = true;
+        arrowLeftHoverAnimation.playbackRate = 1;
+        arrowRightHoverAnimation.playbackRate = 1;
+        arrowLeftHoverAnimation.play();
+        arrowRightHoverAnimation.play();
+    }
+    else {
+        console.log('hide arrows')
+        arrowsVisible = false;
+        arrowLeftHoverAnimation.playbackRate = -1;
+        arrowRightHoverAnimation.playbackRate = -1;
+        arrowLeftHoverAnimation.play();
+        arrowRightHoverAnimation.play();
+    }
+}
 
 function Lerp(p1, p2, t) {
     return ((1-t) * p1 + p2*t)
@@ -21,9 +65,24 @@ function Slide(e) {
     if (e.target.className == 'slide-right') {
         var direction = 1;
     }
+
     else {
         var direction = -1;
     }
+
+    // Javascript returns a negative value on -a mod n, so we have to add n mod n to get a positive value.
+    
+    var currSliderIndex = ((((imageIndex+direction)%sliderImages.length) + sliderImages.length) % sliderImages.length)
+    var prevSliderIndex = (((imageIndex%sliderImages.length) + sliderImages.length) % sliderImages.length);
+
+    fadeDescriptionAnimations[prevSliderIndex].playbackRate = 1;
+    fadeDescriptionAnimations[prevSliderIndex].play();
+    fadeDescriptionAnimations[prevSliderIndex].finished.then(function() {
+        discordDescriptions[prevSliderIndex].classList.add('hidden');
+        fadeDescriptionAnimations[currSliderIndex].playbackRate = -1;
+        fadeDescriptionAnimations[currSliderIndex].play();
+        discordDescriptions[currSliderIndex].classList.remove('hidden');
+    });
 
     function Loop() {
         if (t <= 1.05) {
@@ -34,16 +93,15 @@ function Slide(e) {
 
             if (direction == 1) {
                 ctx.translate(-x, 0);
-                // Javascript returns a negative value on -a mod n, so we have to add n to get a positive value.
-                ctx.drawImage(sliderImages[((((imageIndex+direction)%sliderImages.length) + sliderImages.length) % sliderImages.length)], imageWidth, 0, imageWidth, imageHeight);
+                ctx.drawImage(sliderImages[currSliderIndex], imageWidth, 0, imageWidth, imageHeight);
             }
 
             else {
                 ctx.translate(x, 0);
-                ctx.drawImage(sliderImages[((((imageIndex-1)%sliderImages.length) + sliderImages.length) % sliderImages.length)], -imageWidth, 0, imageWidth, imageHeight);
+                ctx.drawImage(sliderImages[currSliderIndex], -imageWidth, 0, imageWidth, imageHeight);
             }
 
-            ctx.drawImage(sliderImages[(((imageIndex%sliderImages.length) + sliderImages.length) % sliderImages.length)], 0, 0, imageWidth, imageHeight);
+            ctx.drawImage(sliderImages[prevSliderIndex], 0, 0, imageWidth, imageHeight);
 
             t += 0.05;
             ctx.restore();
@@ -70,7 +128,7 @@ function SetImage(image, i) {
     }
 }
 export function Slider(images, canvas) {
-    var canvas = document.querySelector('.' + canvas);
+    var canvas = document.getElementById(canvas);
     canvasWidth = canvas.width;
     canvasHeight = canvas.height;
     ctx = canvas.getContext('2d');
@@ -83,8 +141,21 @@ export function Slider(images, canvas) {
         sliderImage.src = document.location + 'assets/' + images[i];
         SetImage(sliderImage, i);
     }
-    
 
+    for (i = 0; i < discordDescriptions.length; i++) {
+        fadeDescriptionAnimations.push((discordDescriptions[i].animate([
+            {'opacity': 0}
+        ], {
+            duration: 300,
+            fill: 'forwards'
+        })));
+        fadeDescriptionAnimations[i].pause();
+    }
+    
+    console.log('Discord descriptions: %o', discordDescriptions);
+
+    slider.addEventListener('mouseenter', SliderArrows, false);
+    slider.addEventListener('mouseleave', SliderArrows, false);
     arrowLeft.addEventListener('click', Slide, false)
     arrowRight.addEventListener('click', Slide, false)
 }
