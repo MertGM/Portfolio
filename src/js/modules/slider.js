@@ -117,10 +117,9 @@ function Slide(e) {
         Loop();
     }
 }
-function SetImage(image, i) {
+function SetImage(image, first=false) {
     image.onload = function() {
-        sliderImages.push(image);
-        if (i == 0) {
+        if (first) {
             ctx.drawImage(image, 0, 0, image.width, image.height);
             imageWidth = sliderImages[0].width; 
             imageHeight = sliderImages[0].height; 
@@ -135,11 +134,18 @@ export function Slider(images, canvas) {
     var dx = 0;
     
     for (var i = 0; i < images.length; i++) {
-        const sliderImage = new Image(canvasWidth, canvasHeight);
-        sliderImage.crossOrigin = 'anonymous';
-        sliderImage.referrerPolicy = 'no-referrer';
-        sliderImage.src = document.location + 'assets/' + images[i];
-        SetImage(sliderImage, i);
+        sliderImages.push(new Image(canvasWidth, canvasHeight));
+        sliderImages[i].crossOrigin = 'anonymous';
+        sliderImages[i].referrerPolicy = 'no-referrer';
+        sliderImages[i].src = document.location + 'assets/' + images[i];
+
+        // Block the for loop with the function call until image is properly loaded.
+        if (i == 0) {
+            SetImage(sliderImages[i], true);
+        }
+        else {
+            SetImage(sliderImages[i], false);
+        }
     }
 
     for (i = 0; i < discordDescriptions.length; i++) {
