@@ -9,10 +9,38 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css" />
+    <noscript>
+      <style>
+        .no-js {
+          display: block;
+          color: var(--font-p-primary);
+          text-align: center;
+        }
+
+        .spinner-background {
+          display: none;
+        }
+
+        .options-menu {
+          display: none;
+        }
+
+        .nav {
+          display: none;
+        }
+
+      </style>
+    </noscript>
     <script type="module" src="src/js/main.js"></script>
     <script type="module" src="src/mailer/client.js"></script>
   </head>
   <body>
+    <div class="no-js hidden">
+      <p>
+        Animations are disabled.
+        To enable these features, please enable Javscript.
+      </p>
+    </div>
     <div class="spinner-background">
         <img id="spinner" src="assets/Dark_atmosphere.gif">
     </div>
