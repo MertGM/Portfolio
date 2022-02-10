@@ -309,9 +309,10 @@ function EventHandler(event) {
             }
         }
 
-        else if (scroll.state != scroll_state.scrolling && event.target.id == navNodes.id[event.target.id]) {
+        else if (scroll.state != scroll_state.scrolling && event.target.id in navNodes.id) {
 
             console.log('nav found in handler: %s', navNodes.id[event.target.id]);
+            scroll.currentScrollY = document.documentElement.scrollTop;
             var displacement = 0;
 
             for (var i = 0; i < navNodes.id.array.length; i++) {
