@@ -37,7 +37,7 @@ arrowRightHoverAnimation.pause();
 
 function SliderArrows() {
     if (!arrowsVisible) {
-        console.log('show arrows')
+        console.log('show arrows');
         arrowsVisible = true;
         arrowLeftHoverAnimation.playbackRate = 1;
         arrowRightHoverAnimation.playbackRate = 1;
@@ -45,7 +45,7 @@ function SliderArrows() {
         arrowRightHoverAnimation.play();
     }
     else {
-        console.log('hide arrows')
+        console.log('hide arrows');
         arrowsVisible = false;
         arrowLeftHoverAnimation.playbackRate = -1;
         arrowRightHoverAnimation.playbackRate = -1;
@@ -59,10 +59,11 @@ function Lerp(p1, p2, t) {
 }
 
 function Slide(e) {
+    console.log('event: ', e.target);
     var t = 0;
     var x = 0;
 
-    if (e.target.className == 'slide-right') {
+    if (e.target.className == 'slide-right' || e.target.className == 'arrow-right') {
         var direction = 1;
     }
 
