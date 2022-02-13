@@ -8,10 +8,25 @@ from getpass import getpass
 
 port = 587
 mail_server = "smtp.office365.com"
-login_username = os.getenv("OUTLOOK_USERNAME")
+login_username = "mertdalkiran@hotmail.com"
+# Local
 login_password = getpass()
 
 context = ssl.create_default_context()
+
+# Server
+# server_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+# server_context.load_cert_chain("/etc/letsencrypt/live/worldofmine.org/cert.pem", "/etc/letsencrypt/live/worldofmine.org/privkey.pem")
+
+# Server: systemd doesn't allow to take input, instead read pass from file and delete it.
+#try:
+#    with open("/tmp/secret", "r") as f:
+#            login_password = f.readline().strip()
+#except FileNotFoundError:
+#    print("Missing file /tmp/secret")
+#    os._exit(1)
+#
+#os.remove("/tmp/secret")
 
 async def send_mail(message, websocket):
     # Supported mail servers are Outlook and Gmail, as far as I know; Outlook's smtp can send email to gmail and vice vera
@@ -60,7 +75,10 @@ async def handler(websocket):
 
 
 async def main():
-    async with websockets.serve(handler, "", 9999):
+    # Local
+    async with websockets.serve(handler, "127.0.0.1", 9999):
+    # Server
+    # async with websockets.serve(handler, "worldofmine.org", 9999):
         print("Server running")
         await asyncio.Future()
 
