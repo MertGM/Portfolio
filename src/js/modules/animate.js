@@ -453,24 +453,31 @@ export function PreloadAnimations() {
     }
 }
 
+function Wait(ms) {
+    return new Promise(function(resolve) {
+        return setTimeout(resolve, ms);
+    });
+}
 
 export function ConfirmEmailAnimation() {
     console.log('show email modal')
     console.log('playState %o', emailModalAnimation.playState);
 
-    // This prevents animation playing while already running
-    if (emailModalAnimation.playState == 'paused') {
-        emailModalAnimation.playbackRate = 1;
-        emailModalAnimation.play();
-        emailModalAnimation.finished.then(function() {
-            setTimeout(function() {
-                emailModalAnimation.playbackRate = -1;
-                emailModalAnimation.play();
-                emailModalAnimation.finished.then(function() {
-                    emailModalAnimation.pause();
+    return new Promise(function(resolve) {
+        // This prevents animation playing while already running
+        if (emailModalAnimation.playState == 'paused') {
+            emailModalAnimation.playbackRate = 1;
+            emailModalAnimation.play();
+            emailModalAnimation.finished.then(function() {
+                Wait(6000).then(function() {
+                    emailModalAnimation.playbackRate = -1;
+                    emailModalAnimation.play();
+                    emailModalAnimation.finished.then(function() {
+                        emailModalAnimation.pause();
+                        return resolve();
+                    });
                 });
-                console.log('disappear email modal')
-            }, 5000);
-        });
-    }
+            });
+        }
+    });
 }
