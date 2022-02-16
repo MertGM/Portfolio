@@ -2,8 +2,6 @@ import {ConfirmEmailAnimation} from '../js/modules/animate.js';
 
 
 function Message(message) {
-    console.log("received data: %s", message.data);
-    console.log("received by: %s", message.source);
     var email_confirm_text = document.querySelectorAll('.email-confirmation-text');
 
     if (message.data[0] != "0") {
@@ -17,8 +15,6 @@ function Message(message) {
         email_confirm_text[0].innerText = message.data.slice(1);
         email_confirm_text[1].innerText = "";
         ConfirmEmailAnimation();
-
-        console.log('Failed to send email, error: %o', message);
     }
 }
 
@@ -55,7 +51,6 @@ function EmailSubmit() {
     else {
         email_confirm_text[0].innerText = "Oops, mail server is down.";
         email_confirm_text[1].innerText = "Try again later or contact me manually via the email icon.";
-
         ConfirmEmailAnimation();
     }
 }
