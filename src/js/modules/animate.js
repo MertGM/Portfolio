@@ -171,12 +171,7 @@ sunAnimation.pause();
 var navColor = getComputedStyle(nav).getPropertyValue('--li-hover');
 var fontPrimary = getComputedStyle(document.body).getPropertyValue('--font-primary');
 var navAnims = [];
-var navCollapsed = true;
 var navLeftOffset = 0;
-var aside = document.querySelector('aside');
-// 0 = mouseover, 1 = mouseout
-var navCurrentTarget;
-var resizing = false;
 
 for (var i = 0; i < nav.children.length; i++) {
     navAnims.push(nav.children[i].animate([
@@ -192,12 +187,14 @@ for (var i = 0; i < nav.children.length; i++) {
     navAnims[i].pause();
 }
 
-// Resize the nav if x + width gets bigger than screen width
+var aside = document.querySelector('aside');
 
-function Resize(maxX, x) {
+// Resize the nav if x + width gets bigger than screen width
+function ResizeNav(maxX, x) {
     console.log('resize');
     console.log('maxX %o', maxX);
     console.log('x %o', x);
+    // Expand
     if (x > maxX) {
         var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
         var newLeft = prevLeft;
@@ -212,11 +209,15 @@ function Resize(maxX, x) {
                 //console.log('nav left offset %s', navLeftOffset);
                 requestAnimationFrame(Loop);
             }
+            else {
+                navFlags = 3;
+            }
         }
 
         requestAnimationFrame(Loop);
     }
 
+    // Collapse
     else if (navLeftOffset > 0) {
         var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
         var newLeft = prevLeft;
@@ -232,13 +233,12 @@ function Resize(maxX, x) {
                 // Remove applied inline css, so that external css can do the alignment again
                 //console.log('remove attr');
                 aside.removeAttribute('style');
+                navFlags = 0;
             }
         }
 
         requestAnimationFrame(Loop);
     }
-
-    return true;
 }
 
 
@@ -340,54 +340,61 @@ function SetAutoScroll() {
 }
 
 
-// @cleanup instead of multiple variables have a bitfield or better solution to handle it better.
-// Bug: sometimes the nav will collapse twice due to setTimeout queueing it twice.
+function Wait(ms) {
+    return new Promise(function(resolve) {
+        return setTimeout(resolve, ms);
+    });
+}
+
+
+// 0 = Collapsed.
+// 1 = Animation queued to transition from expanded to collapsed (cancelable).
+// 2 = Animating collapse or expand.
+// 3 = Expanded.
+var navFlags = 0;
 function NavAnimation(e) {
     if (e.target.tagName == 'LI') {
         console.log('target type %o', e.type);
-        console.log('navCollapsed %s', navCollapsed);
-        if (e.type == 'mouseover') {
-            navCurrentTarget = 0;
-            if (navCollapsed && resizing == false) {
-                for (var i = 0; i < navAnims.length; i++) {
-                    navAnims[i].playbackRate = 1;
-                    navAnims[i].play()
-                }
-
-                // Passing a function call by name does not work as expected,
-                // only lambda's work for some reason.
-                
-                navAnims[navAnims.length -1].finished.then(function() {
-                    console.log('done animating nav, proceeding to resize...');
-                    Resize(document.body.clientWidth, nav.getBoundingClientRect().right);
-                });
-
-                console.log('nav open');
-                navCollapsed = false;
+        // Cancel queued collapse.
+        if (navFlags == 1) {
+            // Reset to expanded so animation can be queued again.
+            navFlags = 3;
+        }
+        //if (e.type == 'mouseover') {
+        else if (navFlags == 0) {
+            navFlags = 2;
+            for (var i = 0; i < navAnims.length; i++) {
+                navAnims[i].playbackRate = 1;
+                navAnims[i].play()
             }
+
+
+            navAnims[navAnims.length -1].finished.then(function() {
+                console.log('done animating nav, proceeding to resize...');
+                ResizeNav(document.body.clientWidth, nav.getBoundingClientRect().right);
+            });
+
+            console.log('nav open');
+            //}
         }
 
-        else if (e.type == 'mouseout' && navCollapsed == false) {
-            navCurrentTarget = 1;
-            setTimeout(function() {
-                console.log('nav current target', navCurrentTarget);
-                if (navCurrentTarget == 1) {
-                    resizing = true;
-
+        else if (e.type == 'mouseout' && navFlags == 3) {
+            navFlags = 1;
+            Wait(1000).then(function() {
+                // Check if animation is still queued.
+                if (navFlags == 1) {
+                    navFlags = 2;
                     for (var i = 0; i < navAnims.length; i++) {
                         navAnims[i].playbackRate = -1;
                         navAnims[i].play();
                     }
                     navAnims[navAnims.length -1].finished.then(function() {
                         console.log('done animating nav, proceeding to resize...');
-                        if (Resize(0, 0)) {
-                            resizing = false;
-                        }
+                        ResizeNav(0, 0);
                     });
                     console.log('nav collapse');
-                    navCollapsed = true;
                 }
-            }, 1000);
+            });
         }
     }
 }
@@ -453,11 +460,6 @@ export function PreloadAnimations() {
     }
 }
 
-function Wait(ms) {
-    return new Promise(function(resolve) {
-        return setTimeout(resolve, ms);
-    });
-}
 
 export function ConfirmEmailAnimation() {
     console.log('show email modal')

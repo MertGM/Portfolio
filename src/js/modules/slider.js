@@ -9,7 +9,6 @@ var ctx;
 var sliderImages = [];
 var imageIndex = 0;
 var sliding = false;
-var card = document.querySelector('.card');
 var slider = document.querySelector('.slider')
 var discordDescriptions = document.querySelectorAll('.discord');
 var fadeDescriptionAnimations = [];
@@ -132,7 +131,6 @@ export function Slider(images, canvas) {
     canvasWidth = canvas.width;
     canvasHeight = canvas.height;
     ctx = canvas.getContext('2d');
-    var dx = 0;
     
     for (var i = 0; i < images.length; i++) {
         sliderImages.push(new Image(canvasWidth, canvasHeight));
