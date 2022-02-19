@@ -57,10 +57,10 @@ async def send_mail(message, websocket):
             server.starttls(context=context)
             server.ehlo()
             server.login(login_username, login_password)
-            # Confirmation mail to sender
-            server.sendmail(login_username, message[1], message_content)
-            # Send to myself
-            server.sendmail(login_username, login_username, message_for_me)
+            # Confirmation mail to sender.
+            server.sendmail(login_username, message[1], message_content.encode('utf-8'))
+            # Send to myself.
+            server.sendmail(login_username, login_username, message_for_me.encode('utf-8'))
             await websocket.send("1");
 
     except smtplib.SMTPRecipientsRefused:

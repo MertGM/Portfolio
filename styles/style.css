@@ -4,11 +4,13 @@
     --font-primary: #31d9f7;
     --font-secondary: #389ae0;
     --font-header-primary: #38D0F2;
+    --font-header-secondary: #F2B1A1;
     --font-p-primary: #1BA0F2;
     --font-shadow: #f00;
     --border-primary: #2f3aed;
     --btn-primary: #5145ff;
     --btn-secondary: #00a0ff;
+    --btn-font-primary: #5ef;
     --btn-hover: #05f;
     --btn-on: #0f5;
     --btn-off: #f25;
@@ -22,13 +24,15 @@ body.light {
     --bg-primary: #ddf;
     --bg-modal-primary: rgba(200,255, 255, 0.3); 
     --font-header-primary: #F5B8B8;
+    --font-header-secondary: #F2B1A1;
     --font-p-primary: #758898;
     --font-shadow: #bbb;
     --border-primary: #2f3aed;
     --btn-primary: #F28705;
     --btn-secondary: #e2641b;
+    --btn-font-primary: #ffa;
     --btn-hover: #fa8705;
-    --card-primary: #aac;
+    --card-primary: #cef;
     --bg-form: #fff;
 }
 
@@ -331,6 +335,10 @@ aside {
     background-color: var(--card-primary);
 }
 
+.card-title {
+    color: var(--font-header-secondary);
+}
+
 .card-links {
     position: absolute;
     padding-bottom: 1em;
@@ -442,6 +450,7 @@ button:focus {
 
 #submit {
     background-color: var(--btn-primary);
+    color: var(--btn-font-primary);
     padding: 1em;
     border: 0;
     border-radius: 2em;
