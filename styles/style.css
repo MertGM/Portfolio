@@ -129,8 +129,8 @@ body {
 }
 
 
-.about p {
-    max-width: 60%;
+.text-wrapper {
+    width: 60%;
 }
 
 .options-menu {
@@ -584,7 +584,7 @@ a {
         margin-top: 0;
     }
 
-    .about p {
+    .text-wrapper {
         max-width: 80%;
     }
 
