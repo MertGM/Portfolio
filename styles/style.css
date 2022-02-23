@@ -36,6 +36,22 @@ body.light {
     --bg-form: #fff;
 }
 
+@media (prefers-color-scheme: light) {
+    --bg-primary: #ddf;
+    --bg-modal-primary: rgba(200,255, 255, 0.3); 
+    --font-header-primary: #F5B8B8;
+    --font-header-secondary: #F2B1A1;
+    --font-p-primary: #758898;
+    --font-shadow: #bbb;
+    --border-primary: #2f3aed;
+    --btn-primary: #F28705;
+    --btn-secondary: #e2641b;
+    --btn-font-primary: #ffa;
+    --btn-hover: #fa8705;
+    --card-primary: #cef;
+    --bg-form: #fff;
+}
+
 * {
     font-family: 'Yuji Mai', serif;
 }
@@ -566,6 +582,10 @@ a {
         margin-bottom: 1em;
         margin-right: 0;
         margin-top: 0;
+    }
+
+    .about p {
+        max-width: 80%;
     }
 
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   width="60" height="50" viewBox="0 0 15.87 13.22" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <path style="fill:#ff5555;stroke:#000000;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1" d="M 0.62,0.62 H 12.85 V 2.93 h 2.44 V 12.67 H 0.71 Z" />
+    <rect
+       style="fill:#ff3433;fill-opacity:1;stroke:none;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       width="6.74"
+       height="2.87"
+       x="0.22"
+       y="3.71"
+       ry="1.43" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2px;line-height:1.25;font-family:'Bookman Old Style';-inkscape-font-specification:'Bookman Old Style';stroke-width:0.26"
+       x="1.42"
+       y="5.85">
+       <tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;font-family:'Bookman Old Style';-inkscape-font-specification:'Bookman Old Style';stroke-width:0.264583"
+         x="1.42"
+         y="5.85">PDF</tspan></text>
+    <path
+       style="fill:#ff5555;fill-opacity:1;stroke:#000000;stroke-width:0.176;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 13.06,0.70 15.21,2.72 H 13.06 Z" />
+</svg>
