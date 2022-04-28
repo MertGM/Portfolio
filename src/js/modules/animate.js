@@ -6,12 +6,13 @@ var options = document.querySelector('.options');
 var optionIcons = document.getElementById('options-icons');
 var optionsButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
+var buttonScroll = document.getElementById('auto-inner');
+var buttonScrollOuter = document.getElementById('auto-outer');
+
 var moon = document.querySelector('.moon');
-var sun = document.querySelector('.sun');
-var buttonScroll = document.querySelector('.inner-button');
-var buttonScrollOuter = document.querySelector('.outer-button');
-var sunShadow = document.getElementById('sun-shadow');
 var moonShadow = document.getElementById('moon-shadow');
+var sun = document.querySelector('.sun');
+var sunShadow = document.getElementById('sun-shadow');
 
 var nav = document.querySelector('.nav'); 
 
@@ -63,13 +64,12 @@ var spinnerBackgroundAnimation = spinnerBackground.animate([
 spinnerBackgroundAnimation.pause();
 
 
-
-
 var optionsCollapsed = localStorage.getItem('options');
 console.log(optionsCollapsed);
 if (optionsCollapsed == null) {
     optionsCollapsed = false;
 }
+
 
 var autoScroll = localStorage.getItem('auto scroll');
 console.log('auto scroll %s', autoScroll);
@@ -80,6 +80,7 @@ if (autoScroll == null) {
     localStorage.setItem('auto scroll', autoScroll);
 }
 
+
 var buttonAnimation = buttonScroll.animate([
     { transform: 'translateX(-14px)' }
     ], {
@@ -88,6 +89,8 @@ var buttonAnimation = buttonScroll.animate([
         duration: 600
 });
 buttonAnimation.pause();
+
+
 var buttonFillAnimation = buttonScrollOuter.animate([
     { fill: '#0f5' },
     { fill: '#f25' }
@@ -99,14 +102,11 @@ var buttonFillAnimation = buttonScrollOuter.animate([
 buttonFillAnimation.pause();
 
 
-
 var optionsFill;
 var color1;
 var color2;
 var optionsButtonAnimation;
 var optionsOuterButtonAnimation;
-
-// Initialize variables when css is done parsing
 
 function InitButtonAnimation() {
 
@@ -149,6 +149,7 @@ var theme = localStorage.getItem('theme');
 if (theme == null) {
     theme = 'moon';
 }
+
 var moonAnimation = moon.animate([
     {transform: 'scale(0,0)'}
     ], {
@@ -187,29 +188,41 @@ for (var i = 0; i < nav.children.length; i++) {
     navAnims[i].pause();
 }
 
+
 var aside = document.querySelector('aside');
 
-// Resize the nav if x + width gets bigger than screen width
+// Resize the nav if x + width gets bigger than page width
 function ResizeNav(maxX, x) {
+    var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
+    var newLeft = prevLeft;
+    var prevTime = -1;
+    var dt;
+    // Conversion to milliseconds included: unit * ms = 3 * 0.001 
+    var speed = 0.003;
+
     console.log('resize');
     console.log('maxX %o', maxX);
     console.log('x %o', x);
+
     // Expand
     if (x > maxX) {
-        var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
-        var newLeft = prevLeft;
         console.log('prevLeft %s', prevLeft);
-        function Loop() {
+        function Loop(timestamp) {
             if (x > maxX) {
-                //console.log('loop');
-                aside.style.left = ((--newLeft) + 'px');
-                x = nav.getBoundingClientRect().right;
-                //console.log('resize x: %s', x);
-                navLeftOffset = prevLeft - newLeft;
+                if (prevTime == -1) {
+                    prevTime = timestamp;
+                    requestAnimationFrame(Loop);
+                }
+                dt = timestamp - prevTime;
+                newLeft -= speed * dt;
+                aside.style.left = (newLeft + 'px');
+                x -= speed * dt;
+                //console.log('Overflow-x: %s', x);
                 //console.log('nav left offset %s', navLeftOffset);
                 requestAnimationFrame(Loop);
             }
             else {
+                navLeftOffset = prevLeft - newLeft;
                 navFlags = 3;
             }
         }
@@ -219,17 +232,20 @@ function ResizeNav(maxX, x) {
 
     // Collapse
     else if (navLeftOffset > 0) {
-        var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
-        var newLeft = prevLeft;
-        function Loop() {
+        function Loop(timestamp) {
             if (navLeftOffset > 0) {
-                //console.log('loop');
-                aside.style.left = ((++newLeft) + 'px');
-                navLeftOffset--;
+                if (prevTime == -1) {
+                    prevTime = timestamp;
+                    requestAnimationFrame(Loop);
+                }
+                dt = timestamp - prevTime;
+                newLeft += speed * dt;
+                aside.style.left = (newLeft + 'px');
+                navLeftOffset -= speed * dt;
                 //console.log('shrink y offset: %s', navLeftOffset);
                 requestAnimationFrame(Loop);
             }
-            else if (navLeftOffset == 0) {
+            else if (navLeftOffset <= 0) {
                 // Remove applied inline css, so that external css can do the alignment again
                 //console.log('remove attr');
                 aside.removeAttribute('style');
@@ -355,44 +371,45 @@ var navFlags = 0;
 function NavAnimation(e) {
     if (e.target.tagName == 'LI') {
         console.log('target type %o', e.type);
+        console.log('navFlags: %s', navFlags);
         // Cancel queued collapse.
         if (navFlags == 1) {
             // Reset to expanded so animation can be queued again.
             navFlags = 3;
         }
-        //if (e.type == 'mouseover') {
         else if (navFlags == 0) {
             navFlags = 2;
+
             for (var i = 0; i < navAnims.length; i++) {
                 navAnims[i].playbackRate = 1;
-                navAnims[i].play()
+                navAnims[i].play();
             }
-
 
             navAnims[navAnims.length -1].finished.then(function() {
                 console.log('done animating nav, proceeding to resize...');
                 ResizeNav(document.body.clientWidth, nav.getBoundingClientRect().right);
             });
 
-            console.log('nav open');
-            //}
+            console.log('nav expanded.');
         }
-
         else if (e.type == 'mouseout' && navFlags == 3) {
             navFlags = 1;
             Wait(1000).then(function() {
                 // Check if animation is still queued.
                 if (navFlags == 1) {
                     navFlags = 2;
+
                     for (var i = 0; i < navAnims.length; i++) {
                         navAnims[i].playbackRate = -1;
                         navAnims[i].play();
                     }
+
                     navAnims[navAnims.length -1].finished.then(function() {
                         console.log('done animating nav, proceeding to resize...');
                         ResizeNav(0, 0);
                     });
-                    console.log('nav collapse');
+
+                    console.log('nav collapsed.');
                 }
             });
         }

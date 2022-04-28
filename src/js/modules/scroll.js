@@ -1,12 +1,12 @@
 // 
-// Bug: Resize event and click event gets fired multiple times when you switch from back from an other tab.
-// although this chrome doesn't do this, the problem is that scrolling now causes hitching, great...
+// Bug: Resize event and click event get fired multiple times when you switch from tabs.
+// although Chrome doesn't do this, the problem still persists with scrolling hitching.
 // Firefox causes it to randomly scroll up or down and causes a small hitch.
-// For now I don't know how to fix this since this is the browser's implementation fault.
+// For now I don't know how to fix this since this is on the browser's implementation side.
 //
 
 var preferences = {
-    // Local storage uses utf-16 characters
+    // Local storage uses utf-16 encoding.
     auto_scroll: true
 };
 
@@ -28,13 +28,13 @@ var scroll = {
     currentScrollY: 0,
     state: scroll_state.enabled,
     trigger: scroll_trigger.none,
-    node: Array.from(document.body.children),
+    node: Array.from(document.querySelectorAll('.container100')),
     index: 0,
     visibleChange: false,
 };
 
 // Local storage should already be set by animate.js since that is loaded first, so we don't need to check for undefined or null.
-if (localStorage.getItem('auto scroll') == 'false') {   // Default is 'true' and enabled
+if (localStorage.getItem('auto scroll') == 'false') {   // Default is 'true' and enabled.
     preferences.auto_scroll = false;
     scroll.state = scroll_state.disabled;
 }
@@ -42,8 +42,8 @@ if (localStorage.getItem('auto scroll') == 'false') {   // Default is 'true' and
 
 // Object has an id object and index array of the 'navigation' elements.
 // These elements are found via the parent element provided by the user.
-// Elements structure must be identical to the DOM, and ids 
-// must be the same as the containers class.
+// Elements' structure must be identical to the DOM, and id names
+// must equal the containers' class names.
 
 var navNodes = {
     id: {},
@@ -74,11 +74,11 @@ function SetCurrentIndex() {
 function ScrollToNextNode() {
     scroll.currentScrollY = document.documentElement.scrollTop;
 
-    console.log('scroll obj %o', scroll);
-    console.log('scroll.prevScrollY ' + scroll.prevScrollY);
-    console.log('currentScrollY ' + scroll.currentScrollY);
-    console.log('scroll ' + scroll.index);
-    console.log('node obj %o', scroll.node);
+    console.log('scroll object: %o', scroll);
+    console.log('scroll.prevScrollY: ' + scroll.prevScrollY);
+    console.log('currentScrollY: ' + scroll.currentScrollY);
+    console.log('scroll: ' + scroll.index);
+    console.log('node obj: %o', scroll.node);
     
 
         // Don't Auto Scroll down further if the index is at the last container.
@@ -94,23 +94,29 @@ function ScrollToNextNode() {
 }
 
 // Quadratic bezier curve
-function Easein(t, p0,p1,p2) {
+function EaseOut(t, p0, p1, p2) {
     var p = (((1-t)**2 * p0) + (2*(1-t)*t*p1) + (t**2*p2))
     document.documentElement.scroll(0, p);
     return p;
 }
 
 function Scrolldown(dis=1) {
+    scroll.state = scroll_state.scrolling;
+    scroll.prevScrollY = scroll.currentScrollY;
     var t = 0;
-    var sum = 0;
-    (function Loop() {
-        if (scroll.state == scroll_state.enabled) {
-            scroll.state = scroll_state.scrolling;
-            scroll.prevScrollY = scroll.currentScrollY;
-            sum = scroll.node.y[scroll.index+dis];
-            console.log('Sum %c%s  ', 'color: green;', sum);
-            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
-        }
+    var sum = scroll.node.y[scroll.index+dis];
+    var prevTime = -1;
+    var dt;
+    // Conversion to milliseconds included: unit * ms = 1 * 0.001.
+    var speed = 0.001;
+
+    console.log('Sum %c%s  ', 'color: green;', sum);
+    console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+
+    function Loop(timestamp) {
+        if (prevTime == -1) {prevTime = timestamp;}
+        dt = timestamp - prevTime;
+
 
         console.log('prev index %s', scroll.index);
         console.log('Sum %c%s  ', 'color: blue;', sum);
@@ -118,7 +124,6 @@ function Scrolldown(dis=1) {
         
         if (scroll.currentScrollY >= sum) {
             // End of scrolling
-            t = 0;
             scroll.prevScrollY = scroll.currentScrollY;
             scroll.state = scroll_state.enabled;
             scroll.trigger = scroll_trigger.none;
@@ -130,38 +135,47 @@ function Scrolldown(dis=1) {
             return;
         }
 
-        // Having the control point closer to the destination makes scrolling ease out
-        // and further ease in.
-        // The default atm is ease out.
         
-        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum);
-        t+= 0.02;
-
+        t += speed * dt;
+        // Offset of 2 to make sure currentScrollY will be higher or equal to sum.
+        scroll.currentScrollY = EaseOut(t, scroll.prevScrollY, sum, sum + 2);
 
         console.log('scroll.prevScrollY ' + scroll.prevScrollY);
         console.log('scroll.currentScrollY ' + scroll.currentScrollY);
         console.log('scrolled down');
+        console.log('current time: ' + timestamp);
+        console.log('prev time: ' + prevTime);
+        console.log('delta time: ' + dt);
 
+        prevTime = timestamp;
         requestAnimationFrame(Loop);
-    }());
+    };
+    requestAnimationFrame(Loop);
 }
 
 
 function Scrollup(dis=-1) {
+    scroll.state = scroll_state.scrolling;
+    scroll.prevScrollY = scroll.currentScrollY;
     var t = 0;
-    var sum = 0;
-    (function Loop() {
-        if (scroll.state == scroll_state.enabled) {
-            // When scrolling without Auto Scroll index will decrement by 1 if scrollY =  container[i] height - y offset.
-            // Scrolling will now overscroll because index decremented twice. 
-            // Thus incrementing the index will fix this.
-            if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
-            scroll.state = scroll_state.scrolling;
-            scroll.prevScrollY = scroll.currentScrollY;
-            sum = scroll.node.y[scroll.index+dis];
-            console.log('Sum %c%s  ', 'color: green;', sum);
-            console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
-        }
+    var sum = scroll.node.y[scroll.index+dis];
+    var prevTime = -1;
+    var dt;
+    // Conversion to milliseconds included: unit * ms = 1 * 0.001.
+    var speed = 0.001;
+
+    // When scrolling without Auto Scroll, index will decrement by 1 when scrollY = current container's height - y offset.
+    // Scrolling up now happens twice because index decrements twice. 
+    // Thus incrementing the index will fix this.
+    if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
+
+    console.log('Sum %c%s  ', 'color: green;', sum);
+    console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
+
+    function Loop(timestamp) {
+        if (prevTime == -1) {prevTime = timestamp;}
+        dt = timestamp - prevTime;
+
 
         console.log('prev index %s', scroll.index);
         console.log('Sum %c%s  ', 'color: blue;', sum);
@@ -169,7 +183,6 @@ function Scrollup(dis=-1) {
 
         if (scroll.currentScrollY <= sum) {
             // End of scrolling
-            t = 0;
             scroll.prevScrollY = scroll.currentScrollY;
             scroll.state = scroll_state.enabled;
             scroll.trigger = scroll_trigger.none;
@@ -182,17 +195,18 @@ function Scrollup(dis=-1) {
 
         }
 
-        // Javascript doesn't do floating precision without the math library, so we need to force it go less than 0
-        scroll.currentScrollY = Easein(t, scroll.prevScrollY, sum, sum -2);
-        t+= 0.02;
+        t += speed * dt;
+        scroll.currentScrollY = EaseOut(t, scroll.prevScrollY, sum, sum -2);
 
 
         console.log('scroll.prevScrollY ' + scroll.prevScrollY);
         console.log('scroll.currentScrollY ' + scroll.currentScrollY);
         console.log('scrolled up');
 
+        prevTime = timestamp;
         requestAnimationFrame(Loop);
-    }());
+    };
+    requestAnimationFrame(Loop);
 }
 
 function Sum(htmlCollection, start, stop) {
@@ -378,34 +392,17 @@ export function AutoScroll() {
 
 // Add an event listener to the given element, for which the event handler handles.
 
-// Argument 1: Element's event to be listened for, if null then for each container (container100 in this case)
-// the height distance from the top of the page will be assigned as scroll.node.y
+// Argument 1: Element's event to be listened for, if null then for each container (container100 in this case),
+// the distance from the top container to the current container will be assigned to scroll.node.y. 
 // Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events for its children.
 
 export function Listen(el, nav=false) {
     if (el == null) {
         var node = [];
-        var m = 0;
-        var start = -1
+        var start = 0;
         console.log('scroll nodes %o', scroll.node);
         for (var j = 0; j < scroll.node.length; j++) {
-            var classname = scroll.node[j].classList;
-            if (classname != undefined) {
-                for (var k = 0; k < classname.length; k++) {
-                    //console.log(classname[k]);
-                    //console.log(id[m]);
-                    if (classname[k] == 'container100') {
-                        //console.log('found matching id %s', classname[k]);
-                        
-                        if (start == -1) {
-                            start = j;
-                        }
-                        
-                        node.push(Sum(scroll.node, start, j));
-                        m++;
-                    }
-                }
-            }
+            node.push(Sum(scroll.node, start, j));
         }
 
         scroll.node.y = node;
