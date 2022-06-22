@@ -145,7 +145,7 @@ body {
     z-index: 1;
 }
 
-#close-button-wrapper {
+#options-button {
     display: block;
     position: fixed;
     left: 0;
@@ -161,6 +161,7 @@ body {
     pointer-events: none;
     z-index: 2;
 }
+
 .inner-button {
     fill: var(--btn-slider);
     stroke: #aff;
@@ -227,13 +228,13 @@ body {
     color: var(--font-primary);
 }
 
-.moon {
+#moon {
     fill: #aaa;
     cursor: pointer;
     pointer-events: fill;
 }
 
-.sun {
+#sun {
     fill: rgba(255, 255, 255, 0.8);
     cursor: pointer;
     pointer-events: fill;

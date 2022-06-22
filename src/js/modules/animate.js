@@ -3,22 +3,27 @@ var body = document.querySelector('body');
 var optionsMenu = document.querySelector('.options-menu');
 var optionsMenuWrapper = document.querySelector('.options-menu-wrapper');
 var options = document.querySelector('.options');
+
+// Svgs should have id names for handling logic and class if needed for styling.
+// querySelector on svgs don't return Element object but instead SvgElementObject,
+// which does not have an className attribute.
+
 var optionIcons = document.getElementById('options-icons');
-var optionsButton = document.getElementById('inner-circle');
+var optionsInnerButton = document.getElementById('inner-circle');
 var optionsOuterButton = document.getElementById('outer-circle');
-var buttonScroll = document.getElementById('auto-inner');
+var buttonScrollInner= document.getElementById('auto-inner');
 var buttonScrollOuter = document.getElementById('auto-outer');
 
-var moon = document.querySelector('.moon');
+var moon = document.getElementById('moon');
 var moonShadow = document.getElementById('moon-shadow');
-var sun = document.querySelector('.sun');
+var sun = document.getElementById('sun');
 var sunShadow = document.getElementById('sun-shadow');
 
 var nav = document.querySelector('.nav'); 
 
 var emailModal = document.getElementById('email-confirmation');
 
-// We show the options menu at the start, because css messes up transformations.
+// We show the options menu at the start, because css conflicts with our transformations.
 // Because we have flexbox css will also calculate the width and the height over time.
 // So we can't also change the width and height of an flexbox element or parent of one.
 
@@ -81,7 +86,7 @@ if (autoScroll == null) {
 }
 
 
-var buttonAnimation = buttonScroll.animate([
+var buttonAnimation = buttonScrollInner.animate([
     { transform: 'translateX(-14px)' }
     ], {
         fill: 'forwards',
@@ -105,14 +110,11 @@ buttonFillAnimation.pause();
 var optionsFill;
 var color1;
 var color2;
-var optionsButtonAnimation;
+var optionsInnerButtonAnimation;
 var optionsOuterButtonAnimation;
 
 function InitButtonAnimation() {
-
-    optionsButton = document.getElementById('inner-circle');
-    optionsOuterButton = document.getElementById('outer-circle');
-    optionsFill = getComputedStyle(optionsButton).getPropertyValue('--btn-primary');
+    optionsFill = getComputedStyle(optionsInnerButton).getPropertyValue('--btn-primary');
     if ((document.querySelector('body').className) == 'light') {
             color1 = '#f91';
             color2 = '#fb1';
@@ -122,7 +124,7 @@ function InitButtonAnimation() {
             color2 = '#aef'
     }
 
-    optionsButtonAnimation = optionsButton.animate([
+    optionsInnerButtonAnimation = optionsInnerButton.animate([
             { fill: optionsFill},
             { fill: color1},
             { fill: color2},
@@ -130,7 +132,7 @@ function InitButtonAnimation() {
             ], {
                 duration: 500
     });
-    optionsButtonAnimation.pause();
+    optionsInnerButtonAnimation.pause();
 
     optionsOuterButtonAnimation = optionsOuterButton.animate([
             { stroke: optionsFill},
@@ -326,7 +328,7 @@ export function Options(e) {
         optionsOuterButtonAnimation.play();
     }
     else {
-        optionsButtonAnimation.play();
+        optionsInnerButtonAnimation.play();
     }
 
     // local storage uses utf-16 strings
@@ -419,9 +421,9 @@ function NavAnimation(e) {
 
 export function Animate() {
     InitButtonAnimation();
-    buttonScroll.addEventListener('mousedown', SetAutoScroll, false);
+    buttonScrollInner.addEventListener('mousedown', SetAutoScroll, false);
     buttonScrollOuter.addEventListener('mousedown', SetAutoScroll, false);
-    optionsButton.addEventListener('mousedown', Options, false);
+    optionsInnerButton.addEventListener('mousedown', Options, false);
     optionsOuterButton.addEventListener('mousedown', Options, false);
     moon.addEventListener('mousedown', ThemeSwitch, false);
     sun.addEventListener('mousedown', ThemeSwitch, false);
@@ -483,13 +485,15 @@ export function ConfirmEmailAnimation() {
     console.log('playState %o', emailModalAnimation.playState);
 
     return new Promise(function(resolve) {
-        // This prevents animation playing while already running
+        // This prevents an animation from playing if there is already an animation playing.
         if (emailModalAnimation.playState == 'paused') {
             emailModalAnimation.playbackRate = 1;
+            // show modal
             emailModalAnimation.play();
             emailModalAnimation.finished.then(function() {
                 Wait(6000).then(function() {
                     emailModalAnimation.playbackRate = -1;
+                    // hide modal
                     emailModalAnimation.play();
                     emailModalAnimation.finished.then(function() {
                         emailModalAnimation.pause();

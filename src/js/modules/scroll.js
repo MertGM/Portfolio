@@ -158,16 +158,17 @@ function Scrollup(dis=-1) {
     scroll.state = scroll_state.scrolling;
     scroll.prevScrollY = scroll.currentScrollY;
     var t = 0;
+
+    // When scrolling without Auto Scroll, index will decrement by 1 when scrollY <= current container's height - y offset.
+    // Scrolling up now causes the preceded container to be skipped, thus causing an infinite scroll if scroll.index= 1, because the first container (index 0) gets skipped, and scrollY goes to negative infinity.
+    // Incrementing the index by 1 resolves this unexpected behaviour.
+    if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
     var sum = scroll.node.y[scroll.index+dis];
     var prevTime = -1;
     var dt;
     // Conversion to milliseconds included: unit * ms = 1 * 0.001.
     var speed = 0.001;
 
-    // When scrolling without Auto Scroll, index will decrement by 1 when scrollY = current container's height - y offset.
-    // Scrolling up now happens twice because index decrements twice. 
-    // Thus incrementing the index will fix this.
-    if (scroll.prevScrollY > scroll.node.y[scroll.index]){scroll.index++;}
 
     console.log('Sum %c%s  ', 'color: green;', sum);
     console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);

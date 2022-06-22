@@ -1,6 +1,5 @@
 import http.server
 import socketserver
-import os
 
 port = 8000
 
@@ -11,4 +10,3 @@ handler.extensions_map[".mjs"] = "text/javascript"
 with socketserver.TCPServer(("", port), handler) as httpd:
     print("serving at port", port);
     httpd.serve_forever()
-
