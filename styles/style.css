@@ -136,8 +136,8 @@ body {
 .options-menu {
     display: block;
     position: fixed;
-    width: 25%;
-    height: 50%;
+    width: 200px;
+    height: 300px;
     left: 0;
     top: 0;
     border-radius: 3em;
@@ -150,8 +150,8 @@ body {
     position: fixed;
     left: 0;
     top: 0;
-    height: 150px;
-    width: 150px;
+    height: 8rem;
+    width: 8rem;
     z-index: 2;
     pointer-events: none;
     margin-top: 1em;
@@ -190,17 +190,18 @@ body {
 }
 
 .options {
-    flex-flow: row wrap;
-    flex-grow: 0;
-    flex-shrink: 0;
-    justify-content: space-between;
-    box-sizing: border-box;
     opacity: 1;
+}
+
+.options ul {
+    margin: 0;
+    padding: 0.5em 0.5em;
 }
 
 .options li {
     list-style-type: none;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
+    font-size: 0.8rem;
 }
 
 /* name of the settings being a nested flexbox, to make 1 row of columns */
@@ -208,16 +209,10 @@ body {
 .options-menu-wrapper {
     display: flex;
     position: relative;
-    flex-flow: row wrap;
     width: 100%;
-    height: 100%;
-    margin-top: 5em;
-    overflow: auto;
-}
-
-.options-menu-wrapper svg {
-    width: 52%;
     height: 65%;
+    margin-top: 6em;
+    overflow: auto;
 }
 
 .theme {
@@ -245,12 +240,10 @@ body {
     left: 55%;
     right: 0;
     bottom: 0;
-    top: 16%;
-    width: 10px;
-    height: 10px;
-    border-radius: 2em;
-    background-color: rgba(255, 255, 100, 0.55);
-    box-shadow: 2px 2px 50px 30px rgba(255, 255, 120, 1);
+    top: 40%;
+    width: 0px;
+    height: 0px;
+    box-shadow: 0px 0px 50px 30px rgba(255, 255, 120, 1);
 }
 
 
@@ -259,12 +252,10 @@ body {
     left: 55%;
     right: 0;
     bottom: 0;
-    top: 16%;
-    width: 10px;
-    height: 10px;
-    border-radius: 2em;
-    background-color: rgba(160, 180, 200, 0.55);
-    box-shadow: 2px 2px 40px 20px rgba(160, 180, 200, 1);
+    top: 35%;
+    width: 0px;
+    height: 0px;
+    box-shadow: 0px 0px 40px 20px rgba(160, 180, 200, 1);
 }
 
 
@@ -514,15 +505,19 @@ a {
 
 
 @media screen and (max-width: 600px) {
-    .options-menu {
-        width: 65%;
+    #options-button {
+        height: 6em;
+        width: 6em;
     }
 
-    .options ul {
-        padding-left: 1em;
-        padding-right: 1em;
+    .options-menu {
+        border-radius: 2em;
     }
-    
+
+    .options-menu-wrapper {
+        margin-top: 4em;
+    }
+
     .container-spaced {
         border-width: 0.4em;
         border-radius: 3em;
@@ -533,18 +528,15 @@ a {
     }
 
     #moon-shadow {
-        left: 47%;
+        left: 55%;
     }
 
     #sun-shadow {
-        left: 47%;
+        left: 55%;
     }
 
     h1 {
         font-size: 1.1em;
-    }
-    p {
-        font-size: 0.7em;
     }
     li {
         font-size: 0.65em;
@@ -593,18 +585,12 @@ a {
 
 
 @media screen and (min-width: 600px) {
-    .options-menu {
-        width: 50%;
-    }
     aside {
         left: 80%;
     }
 }
 
 @media screen and (min-width: 900px) {
-    .options-menu {
-        width: 35%;
-    }
     .container-spaced {
         border-width: 1em;
         border-radius: 5em;
@@ -630,14 +616,6 @@ a {
 }
 
 @media screen and (min-width: 1400px) {
-    .options-menu {
-        width: 20%;
-    }
-    .options ul {
-        padding-left: 1.5em;
-        padding-right: 1em;
-    }
-
     .container-spaced {
         height: 60%;
     }
