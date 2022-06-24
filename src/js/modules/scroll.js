@@ -194,6 +194,7 @@ function Scrollup(dis=-1) {
 
         }
 
+        scroll.currentScrollY = window.ScrollY;
         t += speed * dt;
         scroll.currentScrollY = EaseOut(t, scroll.prevScrollY, sum, sum -2);
 
