@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css" />
+    <script type="module" src="src/js/main.js"></script>
+    <script type="module" src="src/mailer/client.js"></script>
     <noscript>
       <style>
         .no-js {
@@ -31,14 +33,14 @@
 
       </style>
     </noscript>
-    <script type="module" src="src/js/main.js"></script>
-    <script type="module" src="src/mailer/client.js"></script>
   </head>
   <body>
     <div class="no-js hidden">
       <p>
-        Animations are disabled.
-        To enable these features, please enable JavaScript.
+        Animations and other interactivity will not work.
+      </p>
+      <p>
+        To enable these features, allow JavaScript.
       </p>
     </div>
     <div class="spinner-background">
@@ -52,7 +54,7 @@
       <div class="options-menu-wrapper">
         <div class="options">
           <ul>
-            <li class="auto-scroll-text" id="off">Auto Scroll</li>
+            <li class="auto-scroll-text">Auto Scroll</li>
             <li class="theme">Theme</li>
           </ul>
         </div>
@@ -139,7 +141,7 @@
           <div class="card-links">
             <a class="card-source" href="https://github.com/MertGM/simplediscord" target="_blank" rel="noreferrer">
               <p>
-                Source code
+                  Source code
               </p>
               <img src="assets/github-mini.svg" alt="Github mini icon">
             </a>
