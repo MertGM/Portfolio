@@ -30,7 +30,6 @@ var scroll = {
     trigger: scroll_trigger.none,
     node: Array.from(document.querySelectorAll('.container100')),
     index: 0,
-    visibleChange: false,
 };
 
 // Local storage should already be set by animate.js since that is loaded first, so we don't need to check for undefined or null.
@@ -53,7 +52,7 @@ var navNodes = {
 console.log(scroll.node);
 
 // Check what the index is on page load, so that when you refresh at a certain position,
-// the index corresponds to the container.
+// the index corresponds to the right container.
 
 function SetCurrentIndex() {
     console.log('prevscrolly %s', scroll.prevScrollY);
@@ -82,7 +81,7 @@ function ScrollToNextNode() {
     
 
         // Don't Auto Scroll down further if the index is at the last container.
-        // This is because 1) there is nothing down to scrolll to 2) heights of div get inaccurate when the page is resized, due to overflow not being added to the height.
+        // This is because 1) there is nothing down to scrolll to 2) heights of div get inaccurate when the page is resized, due to possible overflow not being added to the height.
     
         if (scroll.currentScrollY > scroll.prevScrollY && scroll.index < scroll.node.y.length -1) {
             Scrolldown();
@@ -135,7 +134,6 @@ function Scrolldown(dis=1) {
             return;
         }
 
-        
         t += speed * dt;
         // Offset of 2 to make sure currentScrollY will be higher or equal to sum.
         scroll.currentScrollY = EaseOut(t, scroll.prevScrollY, sum, sum + 2);
@@ -196,6 +194,7 @@ function Scrollup(dis=-1) {
 
         }
 
+        scroll.currentScrollY = window.ScrollY;
         t += speed * dt;
         scroll.currentScrollY = EaseOut(t, scroll.prevScrollY, sum, sum -2);
 
@@ -256,21 +255,12 @@ function EventHandler(event) {
     if (event.type == 'resize') {
         console.log('resizing page');
         var containers = document.querySelectorAll('.container100');
-        var links = document.getElementById('links');
 
         for (var i = 0; i < containers.length; i++) {
             scroll.node.y[i] = Sum(containers, 0, i);
         }
 
         console.log('resized scroll node y: %o', scroll.node.y);
-
-        // Remove links from document so that mobile users see more of the contact form.
-        if (scroll.node.y[1] <= 400) {
-            links.style.display = 'none';
-        }
-        else if (links.getAttribute('style') != null) {
-            links.removeAttribute('style');
-        }
     }
 
     else if (event.type == 'scroll' && event.target == document) {
@@ -290,14 +280,14 @@ function EventHandler(event) {
 
     else if (event.type == 'click') {
         console.log('found a click event!');
-        // Sometimes the svg 'options-icons' will trigger, even though it has pointer-events set to none.
-        // However clicking the svg area that is not overlapped by the buttons will not be triggered;
+        // Sometimes the svg 'options-icons' will trigger, despite having pointer-events set to none.
+        // However clicking the svg area that does not coincide with the buttons will not be triggered;
         // So we can check for clicks on the svg aswell.
         
         if (event.target.id == 'auto-inner' || event.target.id == 'auto-outer' || 
             event.target.id == 'options-icons') {
 
-            // Getting the value requires some time, so we need the lambda function, continueing when it returns.
+            // Getting the value requires some time, so we need the lambda function, proceeding when it returns.
             var done = (function() {
                 if (localStorage.getItem('auto scroll') == 'true') {
                     preferences.auto_scroll = true;
@@ -365,7 +355,7 @@ function EventHandler(event) {
         }
     }
 
-    // Temporarily disable Auto Scroll to prevent unexpected scrolling when filling out the form.
+    // Temporarily disable Auto Scroll to prevent interfering scrolling when filling out the form.
     
     else if (event.type == 'focusin' && event.target.tagName != 'BUTTON') {
         console.log('form focus in');
@@ -382,20 +372,18 @@ function EventHandler(event) {
 
 // Enable auto scrolling for the given page.
 export function AutoScroll() {
-    setTimeout(function() {
-        SetCurrentIndex();
-        CurrentNode();
-        window.addEventListener('scroll', EventHandler, false);
-        window.addEventListener('resize', EventHandler, false);
-    }, 100);
+    SetCurrentIndex();
+    CurrentNode();
+    window.addEventListener('scroll', EventHandler, false);
+    window.addEventListener('resize', EventHandler, false);
 }
 
 
-// Add an event listener to the given element, for which the event handler handles.
+// Add a click or focus event listener to the given element, handled by the EventHandler function.
 
-// Argument 1: Element's event to be listened for, if null then for each container (container100 in this case),
+// @param el: Element's event to be listened for, if null then for each container (container100 in this case),
 // the distance from the top container to the current container will be assigned to scroll.node.y. 
-// Argument 2: A navigator is a parent element that is able to be propegated in the bubbling phase, to handle events for its children.
+// @param nav: Parent element that is able to be propegated in the bubbling phase, to handle events for its descendants.
 
 export function Listen(el, nav=false) {
     if (el == null) {

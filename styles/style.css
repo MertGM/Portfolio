@@ -36,24 +36,8 @@ body.light {
     --bg-form: #fff;
 }
 
-@media (prefers-color-scheme: light) {
-    --bg-primary: #ddf;
-    --bg-modal-primary: rgba(200,255, 255, 0.3); 
-    --font-header-primary: #F5B8B8;
-    --font-header-secondary: #F2B1A1;
-    --font-p-primary: #758898;
-    --font-shadow: #bbb;
-    --border-primary: #2f3aed;
-    --btn-primary: #F28705;
-    --btn-secondary: #e2641b;
-    --btn-font-primary: #ffa;
-    --btn-hover: #fa8705;
-    --card-primary: #cef;
-    --bg-form: #fff;
-}
-
 * {
-    font-family: 'Yuji Mai', serif;
+    font-family: 'Yuji Mai', Verdana, Georgia, serif;
 }
 
 html,
@@ -124,7 +108,9 @@ body {
 }
 
 .container100 p {
+    color: var(--font-p-primary);
     font-size: 1rem;
+    font-family: Verdana, Georgia, sans-serif;
     margin: 0.2em;
 }
 
@@ -274,9 +260,9 @@ body {
 
 .container100 {
     display: flex;
-    min-height: 100%;
-    max-height: 100%;
     width: 100%;
+    min-height: 100%;
+    max-height: min-content;
     background-color: var(--bg-primary);
     flex-direction: column;
     align-items: center;
@@ -287,15 +273,9 @@ body {
     color: var(--font-header-primary);
 }
 
-.container100 p {
-    color: var(--font-p-primary);
+.projects, .contact {
+    justify-content: start;
 }
-
-.projects {
-    min-height: 100%;
-    max-height: 900px;
-}
-
 
 aside {
     display: block;
@@ -333,24 +313,22 @@ aside {
 .card {
     display: flex;
     position: relative;
-    width: 300px;
-    height: 370px;
+    width: 20%;
+    height: fit-content;
     border-radius: 1em;
     flex-direction: column;
     align-items: center;
     margin: 1em;
-    overflow-wrap: break-word;
     background-color: var(--card-primary);
 }
 
 .card-title {
     color: var(--font-header-secondary);
+    text-align: center;
 }
 
 .card-links {
-    position: absolute;
     padding-bottom: 1em;
-    bottom: 0;
 }
 
 .card-live {
@@ -363,6 +341,7 @@ aside {
 
 .card-links p {
     display: inline;
+    font-family: 'Yuji Mai', Verdana, Georgia, serif;
 }
 
 .card-links img {
@@ -373,6 +352,10 @@ aside {
 .slider {
     position: relative;
     z-index: 2;
+}
+
+#discord {
+    width: 100%;
 }
 
 .arrow-left {
@@ -398,7 +381,6 @@ aside {
     background-color: var(--bg-modal-primary);
     border-radius: 5em;
     box-shadow: 20px 15px 5px 10px rgb(0, 0, 0, 0.6);
-    overflow-y: auto;
 }
 
 .contact-form {
@@ -497,6 +479,7 @@ button:focus {
 
 #links {
     margin-right: auto;
+    margin-top: auto;
 }
 
 a {
@@ -565,16 +548,10 @@ a {
         margin-top: 10px;
     }
 
-
-    .cards-wrapper {
-        flex-direction: column;
-    }
-
     .card {
+        width: 45%;
         margin-left: 0.1em;
-        margin-bottom: 1em;
-        margin-right: 0;
-        margin-top: 0;
+        margin-right: 0.5em;
     }
 
     .text-wrapper {
@@ -588,6 +565,11 @@ a {
     aside {
         left: 80%;
     }
+
+    .card {
+        width: 33%;
+    }
+
 }
 
 @media screen and (min-width: 900px) {
@@ -608,11 +590,14 @@ a {
     h1 {
         font-size: 1.5em;
     }
+
     aside {
         left: 90%;
     }
 
-
+    .card {
+        width: 25%;
+    }
 }
 
 @media screen and (min-width: 1400px) {
