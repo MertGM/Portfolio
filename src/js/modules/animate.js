@@ -225,7 +225,6 @@ function ResizeNav(maxX, x) {
             }
             else {
                 navLeftOffset = prevLeft - newLeft;
-                navFlags = 3;
             }
         }
 
@@ -380,7 +379,8 @@ function NavAnimation(e) {
             navFlags = 3;
         }
         else if (navFlags == 0) {
-            navFlags = 2;
+            // Allow to queue collapse animation when hovering out of the nav while animating.
+            navFlags = 3;
 
             for (var i = 0; i < navAnims.length; i++) {
                 navAnims[i].playbackRate = 1;
