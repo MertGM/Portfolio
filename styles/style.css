@@ -59,7 +59,8 @@ body {
 }
 
 .disable-scrolling {
-    width: 100%;
+    /* Scrollbar width could vary from 18px. */
+    width: calc(100% - 18px);
     overflow: hidden;
 }
 
