@@ -444,14 +444,14 @@ export function PreloadAnimations() {
         optionsMenuAnimation.finished.then(function() {
             spinnerBackgroundAnimation.play();
             spinnerBackgroundAnimation.finished.then(function () {
-                spinnerBackground.id = 'hidden';
+                spinnerBackground.classList.add('hidden');
             });
         });
     }
     else {
         spinnerBackgroundAnimation.play();
         spinnerBackgroundAnimation.finished.then(function () {
-            spinnerBackground.id = 'hidden';
+            spinnerBackground.classList.add('hidden');
         });
     }
 
