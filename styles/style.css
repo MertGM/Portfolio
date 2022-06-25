@@ -58,6 +58,11 @@ body {
     display: block;
 }
 
+.disable-scrolling {
+    width: 100%;
+    overflow: hidden;
+}
+
 
 #canvas {
     position: absolute;
@@ -89,22 +94,13 @@ body {
     margin-top: 30%;
 }
 
-.spinner-background#hidden {
+.spinner-background.hidden {
     display: none;
 }
 
 .spinner-background svg {
     height: 100%;
     width: 100%;
-}
-
-
-#hidden {
-    display: none;
-}
-
-#visible {
-    display:block;
 }
 
 .container100 p {

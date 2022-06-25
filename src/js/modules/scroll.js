@@ -1,9 +1,4 @@
-// 
-// Bug: Resize event and click event get fired multiple times when you switch from tabs.
-// although Chrome doesn't do this, the problem still persists with scrolling hitching.
-// Firefox causes it to randomly scroll up or down and causes a small hitch.
-// For now I don't know how to fix this since this is on the browser's implementation side.
-//
+// Substitute the scrolling mechanism for a container-to-container scrolling function.
 
 var preferences = {
     // Local storage uses utf-16 encoding.
@@ -127,6 +122,8 @@ function Scrolldown(dis=1) {
             scroll.state = scroll_state.enabled;
             scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
+            // Enable scrolling again.
+            document.body.classList.remove('disable-scrolling');
             console.log('done scrolling');
             console.log('current index %s', scroll.index);
             console.log('current scroll y %c%s  ', 'color: blue;', scroll.currentScrollY);
@@ -186,6 +183,8 @@ function Scrollup(dis=-1) {
             scroll.state = scroll_state.enabled;
             scroll.trigger = scroll_trigger.none;
             scroll.index += dis;
+            // Enable scrolling again.
+            document.body.classList.remove('disable-scrolling');
             console.log('done scrolling');
             console.log('current index %s', scroll.index);
             console.log('Sum %c%s  ', 'color: green;', sum);
@@ -265,6 +264,11 @@ function EventHandler(event) {
     else if (event.type == 'scroll' && event.target == document) {
         // Only start executing the function if page isn't scrolling already.
         if (scroll.state == scroll_state.enabled && preferences.auto_scroll == true) {
+            // Solve scroll hitching by preventing the user from interfering when auto scrolling.
+            // Resolved in a discrete way the class hides overflow,
+            // in other words the root (top-level element) only gets rendered,
+            // which means there is nothing to scroll to (if html and body have a height of 100%.)
+            document.body.classList.add('disable-scrolling');
             scroll.trigger = scroll_trigger.scroll;
             ScrollToNextNode();
         }
@@ -339,6 +343,7 @@ function EventHandler(event) {
                 scroll.state = scroll_state.enabled;
                 console.log('going to scroll up');
 
+                document.body.classList.add('disable-scrolling');
                 Scrollup(displacement);
             }
 
@@ -349,6 +354,7 @@ function EventHandler(event) {
                 scroll.state = scroll_state.enabled;
                 console.log('going to scroll down');
 
+                document.body.classList.add('disable-scrolling');
                 Scrolldown(displacement);
             }
         }
