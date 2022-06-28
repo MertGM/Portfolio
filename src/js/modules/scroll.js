@@ -144,7 +144,7 @@ function Scrolldown(dis=1) {
 
         prevTime = timestamp;
         requestAnimationFrame(Loop);
-    };
+    }
     requestAnimationFrame(Loop);
 }
 
@@ -203,7 +203,7 @@ function Scrollup(dis=-1) {
 
         prevTime = timestamp;
         requestAnimationFrame(Loop);
-    };
+    }
     requestAnimationFrame(Loop);
 }
 

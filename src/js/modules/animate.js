@@ -191,74 +191,6 @@ for (var i = 0; i < nav.children.length; i++) {
 }
 
 
-var aside = document.querySelector('aside');
-
-// Resize the nav if x + width gets bigger than page width
-function ResizeNav(maxX, x) {
-    var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
-    var newLeft = prevLeft;
-    var prevTime = -1;
-    var dt;
-    // Conversion to milliseconds included: unit * ms = 3 * 0.001 
-    var speed = 0.003;
-
-    console.log('resize');
-    console.log('maxX %o', maxX);
-    console.log('x %o', x);
-
-    // Expand
-    if (x > maxX) {
-        console.log('prevLeft %s', prevLeft);
-        function Loop(timestamp) {
-            if (x > maxX) {
-                if (prevTime == -1) {
-                    prevTime = timestamp;
-                    requestAnimationFrame(Loop);
-                }
-                dt = timestamp - prevTime;
-                newLeft -= speed * dt;
-                aside.style.left = (newLeft + 'px');
-                x -= speed * dt;
-                //console.log('Overflow-x: %s', x);
-                //console.log('nav left offset %s', navLeftOffset);
-                requestAnimationFrame(Loop);
-            }
-            else {
-                navLeftOffset = prevLeft - newLeft;
-            }
-        }
-
-        requestAnimationFrame(Loop);
-    }
-
-    // Collapse
-    else if (navLeftOffset > 0) {
-        function Loop(timestamp) {
-            if (navLeftOffset > 0) {
-                if (prevTime == -1) {
-                    prevTime = timestamp;
-                    requestAnimationFrame(Loop);
-                }
-                dt = timestamp - prevTime;
-                newLeft += speed * dt;
-                aside.style.left = (newLeft + 'px');
-                navLeftOffset -= speed * dt;
-                //console.log('shrink y offset: %s', navLeftOffset);
-                requestAnimationFrame(Loop);
-            }
-            else if (navLeftOffset <= 0) {
-                // Remove applied inline css, so that external css can do the alignment again
-                //console.log('remove attr');
-                aside.removeAttribute('style');
-                navFlags = 0;
-            }
-        }
-
-        requestAnimationFrame(Loop);
-    }
-}
-
-
 function ThemeSwitch() {
     if (theme == 'sun') {
         theme = 'moon';
@@ -364,23 +296,97 @@ function Wait(ms) {
 }
 
 
-// 0 = Collapsed.
+var aside = document.querySelector('aside');
+
 // 1 = Animation queued to transition from expanded to collapsed (cancelable).
 // 2 = Animating collapse or expand.
-// 3 = Expanded.
-var navFlags = 0;
-function NavAnimation(e) {
-    if (e.target.tagName == 'LI') {
-        console.log('target type %o', e.type);
-        console.log('navFlags: %s', navFlags);
-        // Cancel queued collapse.
-        if (navFlags == 1) {
-            // Reset to expanded so animation can be queued again.
-            navFlags = 3;
+
+var NavFlags = {
+    collapsed: 0,
+    animationQueued: 1,
+    animating: 2,
+    expanded: 3
+};
+var navState = 0;
+
+// Resize the nav if x + width gets bigger than page width
+function ResizeNav(maxX, x) {
+    var prevLeft = parseInt(((getComputedStyle(aside).left).split('px')[0]));
+    var newLeft = prevLeft;
+    var prevTime = -1;
+    var dt;
+    // Conversion to milliseconds included: unit * ms = 3 * 0.001 
+    var speed = 0.003;
+
+    console.log('resize');
+    console.log('maxX %o', maxX);
+    console.log('x %o', x);
+
+    // Expand
+    if (x > maxX) {
+        console.log('prevLeft %s', prevLeft);
+        function Loop(timestamp) {
+            if (x > maxX) {
+                if (prevTime == -1) {
+                    prevTime = timestamp;
+                    requestAnimationFrame(Loop);
+                }
+                dt = timestamp - prevTime;
+                newLeft -= speed * dt;
+                aside.style.left = (newLeft + 'px');
+                x -= speed * dt;
+                //console.log('Overflow-x: %s', x);
+                //console.log('nav left offset %s', navLeftOffset);
+                requestAnimationFrame(Loop);
+            }
+            else {
+                navLeftOffset = prevLeft - newLeft;
+            }
         }
-        else if (navFlags == 0) {
+
+        requestAnimationFrame(Loop);
+    }
+
+    // Collapse
+    else if (navLeftOffset > 0) {
+        function Loop(timestamp) {
+            if (navLeftOffset > 0) {
+                if (prevTime == -1) {
+                    prevTime = timestamp;
+                    requestAnimationFrame(Loop);
+                }
+                dt = timestamp - prevTime;
+                newLeft += speed * dt;
+                aside.style.left = (newLeft + 'px');
+                navLeftOffset -= speed * dt;
+                //console.log('shrink y offset: %s', navLeftOffset);
+                requestAnimationFrame(Loop);
+            }
+            else if (navLeftOffset <= 0) {
+                // Remove applied inline css, so that external css can do the alignment again
+                //console.log('remove attr');
+                aside.removeAttribute('style');
+                navState = NavFlags.collapsed;
+            }
+        }
+
+        requestAnimationFrame(Loop);
+    }
+}
+
+
+function NavAnimation(e) {
+    if (e.target.tagName == 'LI' && e.type == 'mouseover') {
+        console.log('target type %o', e.type);
+        console.log('navState: %s', navState);
+        // Cancel queued collapse.
+        if (navState == NavFlags.animationQueued) {
+            // Reset to expanded so animation can be queued again.
+            navState = NavFlags.expanded;
+        }
+        else if (navState == NavFlags.collapsed) {
             // Allow to queue collapse animation when hovering out of the nav while animating.
-            navFlags = 3;
+            navState = NavFlags.expanded;
 
             for (var i = 0; i < navAnims.length; i++) {
                 navAnims[i].playbackRate = 1;
@@ -394,27 +400,27 @@ function NavAnimation(e) {
 
             console.log('nav expanded.');
         }
-        else if (e.type == 'mouseout' && navFlags == 3) {
-            navFlags = 1;
-            Wait(1000).then(function() {
-                // Check if animation is still queued.
-                if (navFlags == 1) {
-                    navFlags = 2;
+    }
+    if (e.type == 'mouseout' && navState == NavFlags.expanded) {
+        navState = NavFlags.animationQueued;
+        Wait(1000).then(function() {
+            // Check if animation is still queued.
+            if (navState == NavFlags.animationQueued) {
+                navState = NavFlags.animating;
 
-                    for (var i = 0; i < navAnims.length; i++) {
-                        navAnims[i].playbackRate = -1;
-                        navAnims[i].play();
-                    }
-
-                    navAnims[navAnims.length -1].finished.then(function() {
-                        console.log('done animating nav, proceeding to resize...');
-                        ResizeNav(0, 0);
-                    });
-
-                    console.log('nav collapsed.');
+                for (var i = 0; i < navAnims.length; i++) {
+                    navAnims[i].playbackRate = -1;
+                    navAnims[i].play();
                 }
-            });
-        }
+
+                navAnims[navAnims.length -1].finished.then(function() {
+                    console.log('done animating nav, proceeding to resize...');
+                    ResizeNav(0, 0);
+                });
+
+                console.log('nav collapsed.');
+            }
+        });
     }
 }
 
